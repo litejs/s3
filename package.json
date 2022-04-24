@@ -1,0 +1,21 @@
+{
+  "name": "@litejs/s3",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Lauri Rooden <lauri@rooden.ee>",
+  "description": "Small S3 client",
+  "keywords": [
+    "s3",
+    "litejs"
+  ],
+  "main": "index.js",
+  "files": [],
+  "bugs": "https://github.com/litejs/s3/issues",
+  "repository": "github:litejs/s3",
+  "scripts": {
+    "test": "lj test"
+  },
+  "devDependencies": {
+    "@litejs/cli": "21.11.0"
+  }
+}
