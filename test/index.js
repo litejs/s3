@@ -209,13 +209,13 @@ describe("S3 Client", function() {
 		s3client.list("", null, function(err, data) {
 			assert.notOk(err)
 			assert.own({
-				Name: "buck-list",
-				Prefix: "",
-				NextContinuationToken: "18AYKGrNU+eEyBpQpLqmP7sa97tujeSo6WioT9GWV9zwYJpFFPgWpWURUW/dtYLR3eU5JD6IGyi+yR8gW5AobRQ==",
-				KeyCount: "2",
-				MaxKeys: "2",
-				IsTruncated: "true",
-				Contents: [
+				name: "buck-list",
+				prefix: "",
+				nextContinuationToken: "18AYKGrNU+eEyBpQpLqmP7sa97tujeSo6WioT9GWV9zwYJpFFPgWpWURUW/dtYLR3eU5JD6IGyi+yR8gW5AobRQ==",
+				keyCount: "2",
+				maxKeys: "2",
+				isTruncated: "true",
+				contents: [
 					{
 						"Key": ".env",
 						"LastModified": "2022-04-19T11:43:10.000Z",
@@ -282,7 +282,7 @@ describe("S3 Client", function() {
 		var s3client = mockedClient(mock, {bucket: "buck-1"})
 
 		assert.equal(
-			s3client.url("hello.txt", { Expires: 24*60*60 }),
+			s3client.url("hello.txt", { expires: 24*60*60 }),
 			"https://s3-eu-central-1.amazonaws.com/buck-1/hello.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIOSFODNN7EXAMPLE%2F20220423%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20220423T130929Z&X-Amz-Expires=86400&X-Amz-SignedHeaders=host&X-Amz-Signature=f73cf5288c0c7049b17fb136505359fecb13051e67c42d77e657f15d63c3edef"
 		)
 		assert.own(s3client.client.request, {

@@ -1,7 +1,7 @@
 
 var crypto = require("crypto")
 , expectArray = {
-	Contents: true
+	contents: true
 }
 
 module.exports = S3
@@ -38,8 +38,8 @@ S3.prototype = {
 	list: function(path, opts, next) {
 		return this.get("", Object.assign({
 			prefix: path || "",
-			"list-type": 2,
-			"max-keys": 10
+			listType: 2,
+			maxKeys: 10
 		}, opts), next)
 	},
 	put: function(path, data, opts, next) {
@@ -72,10 +72,10 @@ function awsSig(s3, method, _path, _opts, optsPrefix, headers, longDate, content
 		Algorithm: ALGO,
 		Credential: s3.accessId + "/" + scope,
 		Date: longDate,
-		Expires: 24 * 60 * 60 * 7,
+		Expires: 7 * 24 * 60 * 60,
 		SignedHeaders: sortedHeaders.join(";").toLowerCase()
 	}
-	, opts = Object.assign(optsPrefix ? out : {}, _opts)
+	, opts = assignDashCase(optsPrefix ? out : {}, _opts)
 	, path = (s3.bucket ? "/" + s3.bucket + "/" : "/") + (_path || "").replace(/^\/+/, "")
 	, query = Object.keys(opts).map(queryEnc).sort().join("&") || ""
 	, canonical = [
@@ -98,6 +98,14 @@ function awsSig(s3, method, _path, _opts, optsPrefix, headers, longDate, content
 	out.url = s3.protocol + "://" + s3.host + path + (query ? "?" + query : "") + (optsPrefix ? "&X-Amz-Signature=" + out.sig : "")
 	out.auth = ALGO + " Credential=" + out.Credential + ", SignedHeaders=" + out.SignedHeaders + ", Signature=" + out.sig
 	return out
+	function assignDashCase(target, source) {
+		if (source) Object.keys(source).forEach(function(key) {
+			target[
+				key === "expires" ? "Expires" : key.replace(/[A-Z]/g, "-$&").toLowerCase().replace(/^-/, "")
+			] = source[key]
+		})
+		return target
+	}
 	function queryEnc(key) {
 		return optsPrefix + key + "=" + encodeURIComponent(opts[key])
 	}
@@ -143,7 +151,7 @@ function req(method, path, opts, next, data) {
 					} : Error(path ? "File not found" : "Bucket not found")
 				} else if (res.headers["content-type"] === "application/xml") {
 					data = parseXml(data)
-					data = data.ListBucketResult || data.Error || data
+					data = data.listBucketResult || data.error || data
 				}
 				if (res.statusCode > 299) return reject(data)
 				resolve(data)
@@ -155,10 +163,10 @@ function req(method, path, opts, next, data) {
 function parseXml(str) {
 	var key, val
 	, json = {}
-	, re = /<([-\w]+)(?:\/|[^>]*>((?:(?!<\1)[\s\S])*)<\/\1)>/gm
+	, re = /<(\w)([-\w]+)(?:\/|[^>]*>((?:(?!<\1)[\s\S])*)<\/\1\2)>/gm
 	for (; (val = re.exec(str)); ) {
-		key = val[1]
-		val = val[2] != null ? parseXml(val[2]) : true
+		key = val[1].toLowerCase() + val[2]
+		val = val[3] != null ? parseXml(val[3]) : true
 		if (Array.isArray(json[key])) json[key].push(val)
 		else json[key] = json[key] != null ? [json[key], val] : expectArray[key] ? [val] : val
 	}

@@ -16,6 +16,6 @@
     "test": "lj test"
   },
   "devDependencies": {
-    "@litejs/cli": "21.11.0"
+    "@litejs/cli": "22.5.0"
   }
 }

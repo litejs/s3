@@ -44,7 +44,7 @@ s3client.get("test/hello.txt", function(err, data) {
 
 ```javascript
 // bucket exists
-s3client.stat("test/hello.txt")
+s3client.stat("test/")
 s3client.list("test/")
 s3client.stat("test/hello.txt")
 s3client.get("test/hello.txt")
