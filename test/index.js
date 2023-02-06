@@ -16,7 +16,7 @@ describe("S3 Client", function() {
 		"https://s3-eu-central-1.amazonaws.com/aaa-bbb/?list-type=2&max-keys=10&prefix=":
 		'<?xml version="1.0" encoding="UTF-8"?><Error><Code>NoSuchBucket</Code><Message>The specified bucket does not exist</Message><BucketName>aaa-bbb</BucketName><RequestId>YNKQQ5CHEY8T1NJW</RequestId><HostId>amI3UsqQ6kbks0QA799a0mtfeMxBAL2eyJ73zf73A+tyohffySVep8pjfe0uxaNzIcxhRuZmLOA=</HostId></Error>',
 		"https://s3-eu-central-1.amazonaws.com/buck-list/?list-type=2&max-keys=10&prefix=":
-		'<?xml version="1.0" encoding="UTF-8"?><ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>buck-list</Name><Prefix></Prefix><NextContinuationToken>18AYKGrNU+eEyBpQpLqmP7sa97tujeSo6WioT9GWV9zwYJpFFPgWpWURUW/dtYLR3eU5JD6IGyi+yR8gW5AobRQ==</NextContinuationToken><KeyCount>2</KeyCount><MaxKeys>2</MaxKeys><IsTruncated>true</IsTruncated><Contents><Key>.env</Key><LastModified>2022-04-19T11:43:10.000Z</LastModified><ETag>&quot;f030741faa47308e37d5e0671c5a4228&quot;</ETag><Size>6717</Size><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>hello.txt</Key><LastModified>2022-03-14T13:15:29.000Z</LastModified><ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag><Size>0</Size><StorageClass>STANDARD</StorageClass></Contents></ListBucketResult>'
+		'<?xml version="1.0" encoding="UTF-8"?><ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>buck-list</Name><Prefix></Prefix><NextContinuationToken>18AYKGrNU+eEyBpQpLqmP7sa97tujeSo6WioT9GWV9zwYJpFFPgWpWURUW/dtYLR3eU5JD6IGyi+yR8gW5AobRQ==</NextContinuationToken><KeyCount>2</KeyCount><MaxKeys>2</MaxKeys><IsTruncated>true</IsTruncated><Contents><Key>.env</Key><LastModified>2022-04-19T11:43:10.000Z</LastModified><ETag>&quot;f030741faa47308e37d5e0671c5a4228&quot;</ETag><Size>6717</Size><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>hello.txt</Key><LastModified>2022-03-14T13:15:29.000Z</LastModified><ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag><Boo/><Arr>0</Arr><Arr>1</Arr><Size>0</Size><StorageClass>STANDARD</StorageClass></Contents></ListBucketResult>'
 	}
 
 	function fakeRequest(url, opts, next) {
@@ -170,6 +170,32 @@ describe("S3 Client", function() {
 						"x-amz-date": "20220423T130929Z",
 						"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
 						"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=f77ab4962fa59ed8823503a65a552cb51a5be67589504e314fdb21340a0d71a1"
+					}
+				}]
+			})
+			assert.end()
+		})
+		mock.tick()
+	})
+
+	it("should stat a non-existing file from bucket", function(assert, mock) {
+		var s3client = mockedClient(mock, {bucket: "buck-1"})
+
+		s3client.stat("none.txt", null, function(err, data) {
+			assert.equal(err, Error("File not found"))
+			assert.notOk(data)
+			assert.own(s3client.client.request, {
+				called: 1,
+				errors: 0
+			})
+			assert.own(s3client.client.request.calls[0], {
+				args: ["https://s3-eu-central-1.amazonaws.com/buck-1/none.txt", {
+					method: "HEAD",
+					headers: {
+						"host": "s3-eu-central-1.amazonaws.com",
+						"x-amz-date": "20220423T130929Z",
+						"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+						"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a267714c9315bbd470114c8ffa9b378d15ef40d83af2e5ff8c294ff837044606"
 					}
 				}]
 			})

@@ -13,9 +13,25 @@
   "bugs": "https://github.com/litejs/s3/issues",
   "repository": "github:litejs/s3",
   "scripts": {
-    "test": "lj test"
+    "test": "c8 -r lcov -r text-summary --check-coverage --100 lj test --brief test/index.js && jshint *.js"
   },
   "devDependencies": {
-    "@litejs/cli": "22.5.0"
+    "@litejs/cli": "22.12.0",
+    "c8": "7.12.0",
+    "jshint": "2.13.6"
+  },
+  "jshintConfig": {
+    "asi": true,
+    "esversion": 5,
+    "evil": true,
+    "latedef": "nofunc",
+    "laxcomma": true,
+    "maxdepth": 6,
+    "node": true,
+    "nonbsp": true,
+    "nonstandard": true,
+    "quotmark": "double",
+    "undef": true,
+    "unused": true
   }
 }

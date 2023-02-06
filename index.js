@@ -1,3 +1,4 @@
+/* global Promise */
 
 var crypto = require("crypto")
 , expectArray = {
@@ -173,11 +174,11 @@ function parseXml(str) {
 	return key ? json : str
 }
 function getXml(root, json) {
-	return '<?xml version="1.0" encoding="UTF-8"?>' + nest(root, json || "", ' xmlns="http://s3.amazonaws.com/doc/2006-03-01/"')
+	return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + nest(root, json || "", " xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"")
 	function nest(key, val, attrs) {
-		return "<" + key + attrs + ">"
-			+ (isObj(val) || Array.isArray(val) ? Object.entries(val).map(entryeMap).join("") : val)
-			+ "</" + key + ">"
+		return "<" + key + attrs + ">" +
+			(isObj(val) || Array.isArray(val) ? Object.entries(val).map(entryeMap).join("") : val) +
+			"</" + key + ">"
 	}
 	function entryeMap(e) {
 		return nest(e[0], e[1], "")
