@@ -51,15 +51,12 @@ s3client.get("test/hello.txt")
 s3client.del("test/hello.txt")
 ```
 
-## External links
-
-[GitHub repo](https://github.com/litejs/s3) |
-[npm package](https://npmjs.org/package/@litejs/s3)
-
 
 ## Licence
 
 Copyright (c) 2022 Lauri Rooden &lt;lauri@rooden.ee&gt;  
-[The MIT License](http://lauri.rooden.ee/mit-license.txt)
-
+[MIT License](https://litejs.com/MIT-LICENSE.txt) |
+[GitHub repo](https://github.com/litejs/s3) |
+[npm package](https://npmjs.org/package/@litejs/s3) |
+[Buy Me A Tea][6]
 
