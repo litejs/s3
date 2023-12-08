@@ -58,9 +58,14 @@ describe("S3 Client", function() {
 		}, opts))
 	}
 
-	it("should accept http protocol", function(assert) {
-		var s3client = new S3({ protocol: "http" })
-		assert.strictEqual(s3client.client, require("http"))
+	describe.assert.fnCalled = function(s3client, seq, url, opts) {
+		this.equal(s3client.client.request.calls[seq].args[0], url)
+		this.equal(s3client.client.request.calls[seq].args[1], opts)
+	}
+
+	it("should accept {0} protocol", "http,https", function(proto, assert) {
+		var s3client = new S3({ protocol: proto })
+		assert.strictEqual(s3client.client, require(proto))
 		assert.end()
 	})
 
@@ -74,16 +79,14 @@ describe("S3 Client", function() {
 				called: 1,
 				errors: 0
 			})
-			assert.own(s3client.client.request.calls[0], {
-				args: ["https://s3-eu-central-1.amazonaws.com/buck-1/file1.txt", {
-					method: "GET",
-					headers: {
-						"host": "s3-eu-central-1.amazonaws.com",
-						"x-amz-date": "20220423T130929Z",
-						"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
-						"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=c0fc0f277bb492d0c91af0e9d27092591f1b13c8f20b058226fc91d7c013d1a5"
-					}
-				}]
+			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/buck-1/file1.txt", {
+				method: "GET",
+				headers: {
+					"host": "s3-eu-central-1.amazonaws.com",
+					"x-amz-date": "20220423T130929Z",
+					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=c0fc0f277bb492d0c91af0e9d27092591f1b13c8f20b058226fc91d7c013d1a5"
+				}
 			})
 			assert.end()
 		})
@@ -100,17 +103,15 @@ describe("S3 Client", function() {
 				called: 1,
 				errors: 0
 			})
-			assert.own(s3client.client.request.calls[0], {
-				args: [ "https://s3-eu-central-1.amazonaws.com/buck-1/file1.txt", {
-					method: "GET",
-					headers: {
-						"host": "s3-eu-central-1.amazonaws.com",
-						"User-Agent": "Dummy/1.0",
-						"x-amz-date": "20220423T130929Z",
-						"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
-						"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=c0fc0f277bb492d0c91af0e9d27092591f1b13c8f20b058226fc91d7c013d1a5"
-					}
-				}]
+			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/buck-1/file1.txt", {
+				method: "GET",
+				headers: {
+					"host": "s3-eu-central-1.amazonaws.com",
+					"User-Agent": "Dummy/1.0",
+					"x-amz-date": "20220423T130929Z",
+					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=c0fc0f277bb492d0c91af0e9d27092591f1b13c8f20b058226fc91d7c013d1a5"
+				}
 			})
 			assert.end()
 		})
@@ -136,16 +137,14 @@ describe("S3 Client", function() {
 				called: 1,
 				errors: 0
 			})
-			assert.own(s3client.client.request.calls[0], {
-				args: ["https://s3-eu-central-1.amazonaws.com/buck-2/", {
-					method: "HEAD",
-					headers: {
-						"host": "s3-eu-central-1.amazonaws.com",
-						"x-amz-date": "20220423T130929Z",
-						"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
-						"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=0beac7539f091f6639599716f45739c55abf9544f39780bfae2bf92da2c35847"
-					}
-				}]
+			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/buck-2/", {
+				method: "HEAD",
+				headers: {
+					"host": "s3-eu-central-1.amazonaws.com",
+					"x-amz-date": "20220423T130929Z",
+					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=0beac7539f091f6639599716f45739c55abf9544f39780bfae2bf92da2c35847"
+				}
 			})
 			assert.end()
 		})
@@ -162,16 +161,14 @@ describe("S3 Client", function() {
 				called: 1,
 				errors: 0
 			})
-			assert.own(s3client.client.request.calls[0], {
-				args: ["https://s3-eu-central-1.amazonaws.com/buck-1/file1.txt", {
-					method: "HEAD",
-					headers: {
-						"host": "s3-eu-central-1.amazonaws.com",
-						"x-amz-date": "20220423T130929Z",
-						"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
-						"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=f77ab4962fa59ed8823503a65a552cb51a5be67589504e314fdb21340a0d71a1"
-					}
-				}]
+			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/buck-1/file1.txt", {
+				method: "HEAD",
+				headers: {
+					"host": "s3-eu-central-1.amazonaws.com",
+					"x-amz-date": "20220423T130929Z",
+					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=f77ab4962fa59ed8823503a65a552cb51a5be67589504e314fdb21340a0d71a1"
+				}
 			})
 			assert.end()
 		})
@@ -188,16 +185,14 @@ describe("S3 Client", function() {
 				called: 1,
 				errors: 0
 			})
-			assert.own(s3client.client.request.calls[0], {
-				args: ["https://s3-eu-central-1.amazonaws.com/buck-1/none.txt", {
-					method: "HEAD",
-					headers: {
-						"host": "s3-eu-central-1.amazonaws.com",
-						"x-amz-date": "20220423T130929Z",
-						"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
-						"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a267714c9315bbd470114c8ffa9b378d15ef40d83af2e5ff8c294ff837044606"
-					}
-				}]
+			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/buck-1/none.txt", {
+				method: "HEAD",
+				headers: {
+					"host": "s3-eu-central-1.amazonaws.com",
+					"x-amz-date": "20220423T130929Z",
+					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a267714c9315bbd470114c8ffa9b378d15ef40d83af2e5ff8c294ff837044606"
+				}
 			})
 			assert.end()
 		})
@@ -213,16 +208,15 @@ describe("S3 Client", function() {
 				called: 1,
 				errors: 0
 			})
-			assert.own(s3client.client.request.calls[0], {
-				args: ["https://s3-eu-central-1.amazonaws.com/buck-1/file1.txt", {
-					method: "PUT",
-					headers: {
-						"host": "s3-eu-central-1.amazonaws.com",
-						"x-amz-date": "20220423T130929Z",
-						"x-amz-content-sha256": "64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c",
-						"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date, Signature=7c3d078bb4da25b219264e060bea329836f27487477060d289daeca60435f9bc"
-					}
-				}]
+			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/buck-1/file1.txt", {
+				method: "PUT",
+				headers: {
+					"host": "s3-eu-central-1.amazonaws.com",
+					"Content-Length": 11,
+					"x-amz-date": "20220423T130929Z",
+					"x-amz-content-sha256": "64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c",
+					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date, Signature=7c3d078bb4da25b219264e060bea329836f27487477060d289daeca60435f9bc"
+				}
 			})
 			assert.end()
 		})
@@ -262,16 +256,14 @@ describe("S3 Client", function() {
 				called: 1,
 				errors: 0
 			})
-			assert.own(s3client.client.request.calls[0], {
-				args: ["https://s3-eu-central-1.amazonaws.com/buck-list/?list-type=2&max-keys=10&prefix=", {
-					method: "GET",
-					headers: {
-						"host": "s3-eu-central-1.amazonaws.com",
-						"x-amz-date": "20220423T130929Z",
-						"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
-						"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=94ff79fa807c4b865d476c359e54f58d279a6525fb1a0f1e0ecf0fd5f80bd61c"
-					}
-				}]
+			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/buck-list/?list-type=2&max-keys=10&prefix=", {
+				method: "GET",
+				headers: {
+					"host": "s3-eu-central-1.amazonaws.com",
+					"x-amz-date": "20220423T130929Z",
+					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=94ff79fa807c4b865d476c359e54f58d279a6525fb1a0f1e0ecf0fd5f80bd61c"
+				}
 			})
 			assert.end()
 		})
@@ -288,16 +280,14 @@ describe("S3 Client", function() {
 				called: 1,
 				errors: 0
 			})
-			assert.own(s3client.client.request.calls[0], {
-				args: ["https://s3-eu-central-1.amazonaws.com/a/", {
-					method: "HEAD",
-					headers: {
-						"host": "s3-eu-central-1.amazonaws.com",
-						"x-amz-date": "20220423T130929Z",
-						"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
-						"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=e5c62c6e40d8ef5bfa00b425754f4f81e5399a28a0a69924507e55ac74bb87ba"
-					}
-				}]
+			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/a/", {
+				method: "HEAD",
+				headers: {
+					"host": "s3-eu-central-1.amazonaws.com",
+					"x-amz-date": "20220423T130929Z",
+					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=e5c62c6e40d8ef5bfa00b425754f4f81e5399a28a0a69924507e55ac74bb87ba"
+				}
 			})
 			assert.end()
 		})

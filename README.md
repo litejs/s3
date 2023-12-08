@@ -7,17 +7,16 @@
 [6]: https://www.buymeacoffee.com/lauriro
 
 
-
-S3 client &ndash;  [![Coverage][1]][2] [![size][3]][4] [![Buy Me A Tea][5]][6]
+LiteJS S3 &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
 =========
 
 Minimal S3 client intended for files up to 5GB (that fit to memory).
 
  - No dependencies
 
-### Installation
 
-In Node.js `npm install @litejs/s3`
+### Usage
+
 
 ```javascript
 var S3 = require("@litejs/s3")
@@ -27,12 +26,7 @@ var S3 = require("@litejs/s3")
 	secret: AWS_SECRET,
 	bucket: AWS_BUCKET
 })
-```
 
-### Usage
-
-
-```javascript
 // Use with await
 var data = await s3client.get("test/hello.txt")
 
@@ -40,9 +34,7 @@ var data = await s3client.get("test/hello.txt")
 s3client.get("test/hello.txt", function(err, data) {
 	console.log("Got file", data)
 })
-```
 
-```javascript
 // bucket exists
 s3client.stat("test/")
 s3client.list("test/")
@@ -52,9 +44,7 @@ s3client.del("test/hello.txt")
 ```
 
 
-## Licence
-
-Copyright (c) 2022 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+> Copyright (c) 2022-2023 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [MIT License](https://litejs.com/MIT-LICENSE.txt) |
 [GitHub repo](https://github.com/litejs/s3) |
 [npm package](https://npmjs.org/package/@litejs/s3) |
