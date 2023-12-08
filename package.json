@@ -8,7 +8,7 @@
     "s3",
     "litejs"
   ],
-  "main": "index.js",
+  "main": "s3.js",
   "files": [],
   "bugs": "https://github.com/litejs/s3/issues",
   "repository": "github:litejs/s3",
