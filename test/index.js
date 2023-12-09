@@ -50,6 +50,7 @@ describe("S3 Mock", function() {
 		mock.time("2022-04-23T13:09:29.960Z")
 		return S3(Object.assign({
 			region: AWS_REGION,
+			endpoint: "s3-eu-central-1.amazonaws.com",
 			accessId: AWS_ID,
 			secret: AWS_SECRET,
 			client: {
