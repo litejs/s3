@@ -1,0 +1,21 @@
+name: Live
+run-name: Run regulary to awoid AWS account deletion
+on:
+  schedule:
+  - cron: "21 4 2 * *"
+  workflow_dispatch:
+  workflow_run:
+    workflows: [ Test ]
+    types: [ completed ]
+jobs:
+  Live:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+    - run: npm install
+    - run: npx lj t test/live.js
+      env:
+        S3_AWS_ID: ${{secrets.S3_AWS_ID}}
+        S3_AWS_SECRET: ${{secrets.S3_AWS_SECRET}}
+
