@@ -18,4 +18,8 @@ jobs:
       env:
         S3_AWS_ID: ${{secrets.S3_AWS_ID}}
         S3_AWS_SECRET: ${{secrets.S3_AWS_SECRET}}
+        S3_AWS_ENDPOINT: ${{vars.S3_AWS_ENDPOINT}}
+        S3_R2_ID: ${{secrets.S3_R2_ID}}
+        S3_R2_SECRET: ${{secrets.S3_R2_SECRET}}
+        S3_R2_ENDPOINT: ${{vars.S3_R2_ENDPOINT}}
 

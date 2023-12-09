@@ -10,7 +10,7 @@
 LiteJS S3 &ndash; [![Coverage][1]][2] [![Size][3]][4] [![Buy Me A Tea][5]][6]
 =========
 
-Minimal S3 client intended for files up to 5GB (that fit to memory).
+Minimal S3 client for places, where full SDK functionality is not needed.
 
  - No dependencies
 

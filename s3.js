@@ -13,7 +13,7 @@ function S3(opts) {
 	Object.assign(this, {
 		protocol: "https",
 		client: require(opts.protocol === "http" ? "http" : "https"),
-		endpoint: this[opts.region] || "s3." + opts.region + ".amazonaws.com",
+		endpoint: "s3." + opts.region + ".amazonaws.com",
 		del: req.bind(this, "DELETE"),
 		get: req.bind(this, "GET"),
 		stat: req.bind(this, "HEAD")
