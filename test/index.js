@@ -1,6 +1,6 @@
 
 
-describe("S3 Client", function() {
+describe("S3 Mock", function() {
 	var S3 = require("..")
 	, AWS_ID = "AKIAIOSFODNN7EXAMPLE"
 	, AWS_SECRET = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"

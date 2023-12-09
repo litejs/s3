@@ -13,7 +13,7 @@ function S3(opts) {
 	Object.assign(this, {
 		protocol: "https",
 		client: require(opts.protocol === "http" ? "http" : "https"),
-		host: this[opts.region],
+		endpoint: this[opts.region],
 		del: req.bind(this, "DELETE"),
 		get: req.bind(this, "GET"),
 		stat: req.bind(this, "HEAD")
@@ -48,7 +48,7 @@ S3.prototype = {
 	},
 	url: function(path, opts) {
 		var headers = {
-			host: this.host
+			host: this.endpoint
 		}
 		return awsSig(this, "GET", path, opts, "X-Amz-", headers, awsDate(), "UNSIGNED-PAYLOAD").url
 	}
@@ -96,7 +96,7 @@ function awsSig(s3, method, _path, _opts, optsPrefix, headers, longDate, content
 	, signKey = hmac(hmac(hmac(hmac("AWS4" + s3.secret, shortDate), s3.region), "s3"), "aws4_request")
 
 	out.sig = hmac(signKey, signString).toString("hex").toLowerCase()
-	out.url = s3.protocol + "://" + s3.host + path + (query ? "?" + query : "") + (optsPrefix ? "&X-Amz-Signature=" + out.sig : "")
+	out.url = s3.protocol + "://" + s3.endpoint + path + (query ? "?" + query : "") + (optsPrefix ? "&X-Amz-Signature=" + out.sig : "")
 	out.auth = ALGO + " Credential=" + out.Credential + ", SignedHeaders=" + out.SignedHeaders + ", Signature=" + out.sig
 	return out
 	function assignDashCase(target, source) {
@@ -123,7 +123,7 @@ function req(method, path, opts, next, data) {
 	, longDate = awsDate()
 	, contentHash = data ? hash(data) : "UNSIGNED-PAYLOAD"
 	, headers = {
-		host: s3.host,
+		host: s3.endpoint,
 		"x-amz-date": longDate,
 		"x-amz-content-sha256": contentHash
 	}
