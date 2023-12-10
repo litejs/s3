@@ -29,6 +29,17 @@ describe("S3 live on {0} {1}", [
 		})
 	})
 
+	it("should stat file", [
+		[ "none.txt", Error("File not found"), undefined ],
+	], function(name, expErr, expData, assert) {
+		assert.setTimeout(5000)
+		s3client.stat("none.txt", null, function(err, data) {
+			assert.equal(err, expErr)
+			assert.equal(data, expData)
+			assert.end()
+		})
+	})
+
 	it("should get a file from bucket", function(assert) {
 		s3client.get(fileName, function(err, data) {
 			assert.notOk(err)
