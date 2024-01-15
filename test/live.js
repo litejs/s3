@@ -3,6 +3,7 @@
 describe("S3 live on {0} {1}", [
 	[ "AWS", "eu-north-1" ],
 	[ "R2", "auto" ],
+	[ "GOOG", "auto" ],
 ], function(provider, region) {
 	var S3 = require("..")
 	, ID = process.env["S3_" + provider + "_ID"]
