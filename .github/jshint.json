@@ -2,6 +2,9 @@
   "asi": true,
   "esversion": 5,
   "evil": true,
+  "globals": {
+    "Promise": true
+  },
   "latedef": "nofunc",
   "laxcomma": true,
   "maxdepth": 6,

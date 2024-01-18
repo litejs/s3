@@ -1,4 +1,3 @@
-/* global Promise */
 
 var crypto = require("crypto")
 , expectArray = {
