@@ -58,6 +58,14 @@ describe("S3 live on {0} {1}", [
 		})
 	})
 
+	it("should get error on non-existing file", function(assert, mock) {
+		s3client.get("non-existing-" + fileName, function(err, data) {
+			assert.equal(err, Error("File not found"))
+			assert.notOk(data)
+			assert.end()
+		})
+	})
+
 	it("should delete a file", function(assert) {
 		s3client.del(fileName, function(err) {
 			assert.notOk(err)
