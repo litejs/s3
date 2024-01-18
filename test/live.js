@@ -40,7 +40,7 @@ describe("S3 live on {0} {1}", [
 	})
 
 	it("should stat file", [
-		[ "none.txt", Error("File not found"), undefined ],
+		[ "none.txt", Error("The specified key does not exist."), undefined ],
 	], function(name, expErr, expData, assert) {
 		assert.setTimeout(5000)
 		s3client.stat("none.txt", null, function(err, data) {
@@ -60,7 +60,7 @@ describe("S3 live on {0} {1}", [
 
 	it("should get error on non-existing file", function(assert, mock) {
 		s3client.get("non-existing-" + fileName, function(err, data) {
-			assert.equal(err, Error("File not found"))
+			assert.own(err, {"message": "The specified key does not exist."})
 			assert.notOk(data)
 			assert.end()
 		})

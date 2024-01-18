@@ -129,18 +129,18 @@ function req(method, path, opts, next, data) {
 				data += chunk.toString("utf8")
 			})
 			res.on("end", function() {
-				if (method === "HEAD") {
-					data = res.statusCode < 400 ? {
-						size: +res.headers["content-length"],
-						mtime: new Date(res.headers["last-modified"]),
-						etag: res.headers.etag
-					} : Error(path ? "File not found" : "Bucket not found")
-				} else if (res.headers["content-type"] === "application/xml") {
-					data = parseXml(data)
-					data = data.listBucketResult || data.error || data
+				if (res.statusCode > 299) {
+					data = method !== "HEAD" && parseXml(data).error || (
+						path ? "The specified key does not exist." : "The specified bucket is not valid."
+					)
+					return reject(Error(data.message || data))
 				}
-				if (res.statusCode > 299) return reject(data)
-				resolve(data)
+				data = method === "HEAD" ? {
+					size: +res.headers["content-length"],
+					mtime: new Date(res.headers["last-modified"]),
+					etag: res.headers.etag
+				} : parseXml(data)
+				resolve(data.listBucketResult || data.error || data)
 			})
 			res.on("error", reject)
 		}

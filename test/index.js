@@ -9,8 +9,10 @@ describe("S3 Mock", function() {
 	, fakeStorage = {
 		"https://s3-eu-central-1.amazonaws.com/buck-1/": "<>",
 		"https://s3-eu-central-1.amazonaws.com/buck-1/file1.txt": "Hello",
-		"https://s3-eu-central-1.amazonaws.com/a/?list-type=2&max-keys=10&prefix=":
-		'<?xml version="1.0" encoding="UTF-8"?><Error><Code>InvalidBucketName</Code><Message>The specified bucket is not valid.</Message><BucketName>a</BucketName><RequestId>Q4T6PZWDG38ABGDS</RequestId><HostId>yQ1ESNjLMN5eOb5nJIdgHHvtxclAX5t2DElg0UqVJZ+DR5aMocJkzmtwWIAcwcErWcpqQFjXEE0=</HostId></Error>',
+		"https://s3-eu-central-1.amazonaws.com/a/?list-type=2&max-keys=10&prefix=": {
+			code: 404,
+			body: "<?xml version='1.0' encoding='UTF-8'?><Error><Code>InvalidBucketName</Code><Message>The specified bucket is not valid.</Message><BucketName>a</BucketName><RequestId>Q4T6PZWDG38ABGDS</RequestId><HostId>yQ1ESNjLMN5eOb5nJIdgHHvtxclAX5t2DElg0UqVJZ+DR5aMocJkzmtwWIAcwcErWcpqQFjXEE0=</HostId></Error>",
+		},
 		"https://s3-eu-central-1.amazonaws.com/aaa/?list-type=2&max-keys=10&prefix=":
 		'<?xml version="1.0" encoding="UTF-8"?><Error><Code>PermanentRedirect</Code><Message>The bucket you are attempting to access must be addressed using the specified endpoint. Please send all future requests to this endpoint.</Message><Endpoint>s3.amazonaws.com</Endpoint><Bucket>aaa</Bucket><RequestId>EMZH6M0NJJZVRAVT</RequestId><HostId>ugvCvJQ9gZhsWgZqK4qxXuF75k3XEbEtjP8OEEcSikCc5CHRk1Dr3ijH0M7nHEtzLkfSmwmAOEA=</HostId></Error>',
 		"https://s3-eu-central-1.amazonaws.com/aaa-bbb/?list-type=2&max-keys=10&prefix=":
@@ -37,10 +39,11 @@ describe("S3 Mock", function() {
 		function respond() {
 			response.statusCode = 404
 			if (fakeStorage[url]) {
-				response.statusCode = 200
-				response.headers["content-length"] = fakeStorage[url].length
-				if (fakeStorage[url].charAt(0) === "<") response.headers["content-type"] = "application/xml"
-				listeners.data(fakeStorage[url])
+				var body = fakeStorage[url].body || fakeStorage[url]
+				response.statusCode = fakeStorage[url].code || 200
+				response.headers["content-length"] = body.length
+				if (body.charAt(0) === "<") response.headers["content-type"] = "application/xml"
+				listeners.data(body)
 			}
 			listeners.end()
 		}
@@ -132,7 +135,7 @@ describe("S3 Mock", function() {
 		var s3client = mockedClient(mock, {bucket: "buck-2"})
 
 		s3client.stat(null, null, function(err, data) {
-			assert.equal(err, Error("Bucket not found"))
+			assert.equal(err, Error("The specified bucket is not valid."))
 			assert.notOk(data)
 			assert.own(s3client.client.request, {
 				called: 1,
@@ -180,7 +183,7 @@ describe("S3 Mock", function() {
 		var s3client = mockedClient(mock, {bucket: "buck-1"})
 
 		s3client.stat("none.txt", null, function(err, data) {
-			assert.equal(err, Error("File not found"))
+			assert.equal(err, Error("The specified key does not exist."))
 			assert.notOk(data)
 			assert.own(s3client.client.request, {
 				called: 1,
@@ -271,11 +274,11 @@ describe("S3 Mock", function() {
 		mock.tick()
 	})
 
-	it("should handle invalid bucket name", function(assert, mock) {
+	it("should stat invalid bucket", function(assert, mock) {
 		var s3client = mockedClient(mock, {bucket: "a"})
 
 		s3client.stat("", null, function(err, data) {
-			assert.own(err, { message: "Bucket not found" })
+			assert.own(err, { message: "The specified bucket is not valid." })
 			assert.notOk(data)
 			assert.own(s3client.client.request, {
 				called: 1,
@@ -288,6 +291,30 @@ describe("S3 Mock", function() {
 					"x-amz-date": "20220423T130929Z",
 					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=e5c62c6e40d8ef5bfa00b425754f4f81e5399a28a0a69924507e55ac74bb87ba"
+				}
+			})
+			assert.end()
+		})
+		mock.tick()
+	})
+
+	it("should list invalid bucket", function(assert, mock) {
+		var s3client = mockedClient(mock, {bucket: "a"})
+
+		s3client.list("", null, function(err, data) {
+			assert.own(err, { message: "The specified bucket is not valid." })
+			assert.notOk(data)
+			assert.own(s3client.client.request, {
+				called: 1,
+				errors: 0
+			})
+			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/a/?list-type=2&max-keys=10&prefix=", {
+				method: "GET",
+				headers: {
+					"host": "s3-eu-central-1.amazonaws.com",
+					"x-amz-date": "20220423T130929Z",
+					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=910e361836dd01e54e022fca928db767b4108554f7ed22bfaf901db40233bd25"
 				}
 			})
 			assert.end()
