@@ -20,12 +20,13 @@ Minimal S3 client for places, where full SDK functionality is not needed.
 
 ```javascript
 var S3 = require("@litejs/s3")
-, s3client = new S3({
-	region: AWS_REGION,
-	accessId: AWS_ID,
-	secret: AWS_SECRET,
-	bucket: AWS_BUCKET
-})
+, s3client = new S3({ accessId: ID, secret: SECRET, region: "us-east-2", endpoint: "BUCKET.s3.us-east-2.amazonaws.com" })
+
+// More examples
+, awsDeprecatedPathStyle = new S3({ region: AWS_REGION, accessId: ID, secret: SECRET, bucket: AWS_BUCKET })
+, googleCloudStorage = new S3({ accessId: ID, secret: SECRET, region: "auto", endpoint: "storage.googleapis.com" })
+, cloudflareR2 = new S3({ accessId: ID, secret: SECRET, region: "auto", endpoint: "MY-ID.r2.cloudflarestorage.com" })
+
 
 // Use with await
 var data = await s3client.get("test/hello.txt")
@@ -43,8 +44,7 @@ s3client.get("test/hello.txt")
 s3client.del("test/hello.txt")
 ```
 
-
-> Copyright (c) 2022-2023 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+> Copyright (c) 2022-2024 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [MIT License](https://litejs.com/MIT-LICENSE.txt) |
 [GitHub repo](https://github.com/litejs/s3) |
 [npm package](https://npmjs.org/package/@litejs/s3) |

@@ -1,19 +1,28 @@
 
 
 describe("S3 live on {0} {1}", [
-	[ "AWS", "eu-north-1" ],
-	[ "R2", "auto" ],
-	[ "GOOG", "auto" ],
-], function(provider, region) {
+	[ "AWS", "eu-north-1", false ],
+	[ "AWS", "eu-north-1", true ],
+	[ "R2", "auto", false ],
+	[ "GOOG", "auto", false ],
+], function(provider, region, virtualStyle) {
 	var S3 = require("..")
+	, bucket = "litejs-test"
 	, ID = process.env["S3_" + provider + "_ID"]
 	, SECRET = process.env["S3_" + provider + "_SECRET"]
 	, ENDPOINT = process.env["S3_" + provider + "_ENDPOINT"]
 
+	if (ENDPOINT && virtualStyle) {
+		// https://s3.region-code.amazonaws.com/bucket-name/key-name - Path-style requests
+		// https://bucket-name.s3.region-code.amazonaws.com/key-name - Virtual-hosted–style requests
+		ENDPOINT = bucket + "." + ENDPOINT
+		bucket = null
+	}
+
 	if (!ID || !SECRET || !ENDPOINT) return "skip"
 
 	var s3client = new S3({
-		bucket: "litejs-test",
+		bucket: bucket,
 		region: region,
 		endpoint: ENDPOINT,
 		accessId: ID,
