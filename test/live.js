@@ -7,6 +7,7 @@ describe("S3 live on {0} {1}", [
 	[ "B2", "eu-central-003", false ],
 	[ "B2", "eu-central-003", true ],
 	[ "GOOG", "auto", false ],
+	[ "STORJ", "global", false ],
 ], function(provider, region, virtualStyle) {
 	var S3 = require("..")
 	, bucket = "litejs-test"
