@@ -25,4 +25,7 @@ jobs:
         S3_R2_ID: ${{secrets.S3_R2_ID}}
         S3_R2_SECRET: ${{secrets.S3_R2_SECRET}}
         S3_R2_ENDPOINT: ${{vars.S3_R2_ENDPOINT}}
+        S3_B2_ID: ${{secrets.S3_B2_ID}}
+        S3_B2_SECRET: ${{secrets.S3_B2_SECRET}}
+        S3_B2_ENDPOINT: ${{vars.S3_B2_ENDPOINT}}
 

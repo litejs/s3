@@ -4,6 +4,8 @@ describe("S3 live on {0} {1}", [
 	[ "AWS", "eu-north-1", false ],
 	[ "AWS", "eu-north-1", true ],
 	[ "R2", "auto", false ],
+	[ "B2", "eu-central-003", false ],
+	[ "B2", "eu-central-003", true ],
 	[ "GOOG", "auto", false ],
 ], function(provider, region, virtualStyle) {
 	var S3 = require("..")
@@ -51,6 +53,7 @@ describe("S3 live on {0} {1}", [
 	})
 
 	it("should get a file from bucket", function(assert) {
+		assert.setTimeout(5000)
 		s3client.get(fileName, function(err, data) {
 			assert.notOk(err)
 			assert.equal(data, content)
@@ -59,14 +62,18 @@ describe("S3 live on {0} {1}", [
 	})
 
 	it("should get error on non-existing file", function(assert, mock) {
+		assert.setTimeout(5000)
 		s3client.get("non-existing-" + fileName, function(err, data) {
-			assert.own(err, {"message": "The specified key does not exist."})
+			// Blackblaze returns "Key not found"
+			assert.ok(err)
+			assert.anyOf(err.message, [ "The specified key does not exist.", "Key not found" ])
 			assert.notOk(data)
 			assert.end()
 		})
 	})
 
 	it("should delete a file", function(assert) {
+		assert.setTimeout(5000)
 		s3client.del(fileName, function(err) {
 			assert.notOk(err)
 			assert.end()
