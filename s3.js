@@ -31,10 +31,7 @@ S3.prototype = {
 		return req.call(this, "PUT", path, opts, next, data)
 	},
 	url: function(path, opts) {
-		var headers = {
-			host: this.endpoint
-		}
-		return awsSig(this, "GET", path, opts, "X-Amz-", headers, awsDate(), "UNSIGNED-PAYLOAD").url
+		return awsSig(this, "GET", path, opts, "X-Amz-", { host: this.endpoint }, awsDate(), "UNSIGNED-PAYLOAD").url
 	}
 }
 
@@ -48,7 +45,8 @@ function awsDate() {
 	// YYYYMMDDTHHmmssZ
 	return new Date().toISOString().replace(/-|:|\.\d*/g, "")
 }
-function awsSig(s3, method, _path, _opts, optsPrefix, headers, longDate, contentHash) {
+function awsSig(s3, method, path, _opts, optsPrefix, headers, longDate, contentHash) {
+	path = (path || "").replace(/^\/*/, (s3.bucket ? "/" + s3.bucket + "/" : "/"))
 	var ALGO = "AWS4-HMAC-SHA256"
 	, shortDate = longDate.slice(0, 8)
 	, scope = shortDate + "/" + s3.region + "/s3/aws4_request"
@@ -61,7 +59,6 @@ function awsSig(s3, method, _path, _opts, optsPrefix, headers, longDate, content
 		SignedHeaders: sortedHeaders.join(";").toLowerCase()
 	}
 	, opts = assignDashCase(optsPrefix ? out : {}, _opts)
-	, path = (s3.bucket ? "/" + s3.bucket + "/" : "/") + (_path || "").replace(/^\/+/, "")
 	, query = Object.keys(opts).map(queryEnc).sort().join("&") || ""
 	, canonical = [
 		method,
