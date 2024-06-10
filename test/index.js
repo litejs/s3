@@ -76,7 +76,7 @@ describe("S3 Mock", function() {
 	it("should get a file without a bucket", function(assert, mock) {
 		var s3client = mockedClient(mock)
 
-		s3client.get("buck-1/file1.txt", null, function(err, data) {
+		s3client.get("buck-1/file1.txt", function(err, data) {
 			assert.notOk(err)
 			assert.equal(data, "Hello")
 			assert.own(s3client.client.request, {
@@ -100,7 +100,7 @@ describe("S3 Mock", function() {
 	it("should get a file from bucket", function(assert, mock) {
 		var s3client = mockedClient(mock, { bucket: "buck-1", userAgent: "Dummy/1.0" })
 
-		s3client.get("file1.txt", null, function(err, data) {
+		s3client.get("file1.txt", function(err, data) {
 			assert.notOk(err)
 			assert.equal(data, "Hello")
 			assert.own(s3client.client.request, {
@@ -134,7 +134,7 @@ describe("S3 Mock", function() {
 	it("should stat a non-existing bucket", function(assert, mock) {
 		var s3client = mockedClient(mock, {bucket: "buck-2"})
 
-		s3client.stat(null, null, function(err, data) {
+		s3client.stat(null, function(err, data) {
 			assert.equal(err, Error("The specified bucket is not valid."))
 			assert.notOk(data)
 			assert.own(s3client.client.request, {
@@ -158,7 +158,7 @@ describe("S3 Mock", function() {
 	it("should stat a existing file from bucket", function(assert, mock) {
 		var s3client = mockedClient(mock, {bucket: "buck-1"})
 
-		s3client.stat("file1.txt", null, function(err, data) {
+		s3client.stat("file1.txt", function(err, data) {
 			assert.notOk(err)
 			assert.own(data, { size: 5 })
 			assert.own(s3client.client.request, {
@@ -182,7 +182,7 @@ describe("S3 Mock", function() {
 	it("should stat a non-existing file from bucket", function(assert, mock) {
 		var s3client = mockedClient(mock, {bucket: "buck-1"})
 
-		s3client.stat("none.txt", null, function(err, data) {
+		s3client.stat("none.txt", function(err, data) {
 			assert.equal(err, Error("The specified key does not exist."))
 			assert.notOk(data)
 			assert.own(s3client.client.request, {

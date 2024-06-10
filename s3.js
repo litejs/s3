@@ -13,9 +13,9 @@ function S3(opts) {
 		protocol: "https",
 		client: require(opts.protocol === "http" ? "http" : "https"),
 		endpoint: "s3." + opts.region + ".amazonaws.com",
-		del: req.bind(this, "DELETE"),
-		get: req.bind(this, "GET"),
-		stat: req.bind(this, "HEAD")
+		del: req.bind(this, "DELETE", null),
+		get: req.bind(this, "GET", null),
+		stat: req.bind(this, "HEAD", null)
 	}, opts)
 }
 
@@ -28,7 +28,7 @@ S3.prototype = {
 		}, opts), next)
 	},
 	put: function(path, data, opts, next) {
-		return req.call(this, "PUT", path, opts, next, data)
+		return req.call(this, "PUT", data, path, opts, next)
 	},
 	url: function(path, opts) {
 		return awsSig(this, "GET", path, opts, "X-Amz-", { host: this.endpoint }, awsDate(), "UNSIGNED-PAYLOAD").url
@@ -95,7 +95,7 @@ function awsSig(s3, method, path, _opts, optsPrefix, headers, longDate, contentH
 		return header.toLowerCase() + (":" + headers[header]).replace(/ +/g, " ")
 	}
 }
-function req(method, path, opts, next, data) {
+function req(method, data, path, opts, next) {
 	if (isFn(opts)) {
 		next = opts
 		opts = null
