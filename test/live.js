@@ -10,6 +10,7 @@ describe("S3 live on {0} {1}", [
 	//[ "STORJ", "global", false ],
 ], function(provider, region, virtualStyle) {
 	var S3 = require("..")
+	, fs = require("fs")
 	, bucket = "litejs-test"
 	, ID = process.env["S3_" + provider + "_ID"]
 	, SECRET = process.env["S3_" + provider + "_SECRET"]
@@ -59,6 +60,39 @@ describe("S3 live on {0} {1}", [
 			assert.notOk(err)
 			assert.equal(data, content)
 			assert.end()
+		})
+	})
+
+	it("should stream a file from bucket", async function(assert) {
+		assert.setTimeout(5000)
+		var name = "./" + fileName
+		, writeTo = fs.createWriteStream(name)
+		await s3client.get(fileName, writeTo)
+		assert.equal(fs.readFileSync(name, "utf8"), content)
+		fs.unlinkSync(name)
+	})
+
+	it("should get error on streaming non-existing file", async function(assert, mock) {
+		assert.setTimeout(5000)
+
+		var name = "./" + fileName
+		, writeTo = fs.createWriteStream(name)
+		try {
+			await s3client.get("non-existing-" + fileName, writeTo)
+		} catch(err) {
+			assert.ok(err)
+			assert.anyOf(err.message, [ "The specified key does not exist.", "Key not found" ])
+		}
+	})
+
+	it("should catch error on streaming", function(assert, mock) {
+		assert.setTimeout(5000)
+
+		var name = "./" + fileName
+		, writeTo = fs.createWriteStream(name)
+		return s3client.get("non-existing-" + fileName, writeTo).catch(function(err) {
+			assert.ok(err)
+			assert.anyOf(err.message, [ "The specified key does not exist.", "Key not found" ])
 		})
 	})
 

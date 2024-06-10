@@ -26,6 +26,9 @@ describe("S3 Mock", function() {
 		, response = {
 			statusCode: 200,
 			headers: {},
+			pipe: function(readable) {
+				listeners.data = readable.write
+			},
 			on: function(ev, fn) {
 				listeners[ev] = fn
 			}
@@ -120,6 +123,16 @@ describe("S3 Mock", function() {
 			assert.end()
 		})
 		mock.tick()
+	})
+
+	it("should get a stream from bucket", function(assert, mock) {
+		var s3client = mockedClient(mock, { bucket: "buck-1", userAgent: "Dummy/1.0" })
+		, stream = { pipe: mock.fn(), write: mock.fn() }
+		s3client.get("file1.txt", stream)
+
+		mock.tick()
+		assert.equal(stream.write.calls[0].args[0], "Hello")
+		assert.end()
 	})
 
 	it("should stat existing bucket", function(assert, mock) {

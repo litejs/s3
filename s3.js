@@ -96,7 +96,7 @@ function awsSig(s3, method, path, _opts, optsPrefix, headers, longDate, contentH
 	}
 }
 function req(method, data, path, opts, next) {
-	if (isFn(opts)) {
+	if (isFn(opts) || isStream(opts)) {
 		next = opts
 		opts = null
 	}
@@ -120,6 +120,11 @@ function req(method, data, path, opts, next) {
 	function makeReq(resolve, reject) {
 		s3.client.request(signed.url, { method: method, headers: headers }, handle).end(data)
 		function handle(res) {
+			res.on("error", reject)
+			if (res.statusCode === 200 && isStream(next)) {
+				res.pipe(next)
+				return res.on("end", resolve)
+			}
 			var data = ""
 			res.on("data", function(chunk) {
 				data += chunk.toString("utf8")
@@ -138,7 +143,6 @@ function req(method, data, path, opts, next) {
 				} : parseXml(data)
 				resolve(data.listBucketResult || data.error || data)
 			})
-			res.on("error", reject)
 		}
 	}
 }
@@ -170,5 +174,8 @@ function isFn(fn) {
 }
 function isObj(obj) {
 	return !!obj && obj.constructor === Object
+}
+function isStream(stream) {
+	return stream && isFn(stream.pipe)
 }
 
