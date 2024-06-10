@@ -96,7 +96,7 @@ function awsSig(s3, method, path, _opts, optsPrefix, headers, longDate, contentH
 	}
 }
 function req(method, path, opts, next, data) {
-	if (typeof opts === "function") {
+	if (isFn(opts)) {
 		next = opts
 		opts = null
 	}
@@ -115,7 +115,7 @@ function req(method, path, opts, next, data) {
 	headers.Authorization = signed.auth
 	// Add after signature to exclude from signing
 	if (s3.userAgent) headers["User-Agent"] = s3.userAgent
-	if (!next) return new Promise(makeReq)
+	if (!isFn(next)) return new Promise(makeReq)
 	makeReq(next.bind(null, null), next)
 	function makeReq(resolve, reject) {
 		s3.client.request(signed.url, { method: method, headers: headers }, handle).end(data)
@@ -164,6 +164,9 @@ function getXml(root, json) {
 	function entryeMap(e) {
 		return nest(e[0], e[1], "")
 	}
+}
+function isFn(fn) {
+	return typeof fn === "function"
 }
 function isObj(obj) {
 	return !!obj && obj.constructor === Object
