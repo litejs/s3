@@ -50,7 +50,7 @@ function awsSig(s3, method, path, _opts, optsPrefix, headers, longDate, contentH
 	var ALGO = "AWS4-HMAC-SHA256"
 	, shortDate = longDate.slice(0, 8)
 	, scope = shortDate + "/" + s3.region + "/s3/aws4_request"
-	, sortedHeaders = Object.keys(headers).sort()
+	, sortedHeaders = Object.keys(assignDashCase(headers, _opts && _opts.meta, "x-amz-meta-")).sort()
 	, out = {
 		Algorithm: ALGO,
 		Credential: s3.accessId + "/" + scope,
@@ -58,7 +58,7 @@ function awsSig(s3, method, path, _opts, optsPrefix, headers, longDate, contentH
 		Expires: 7 * 24 * 60 * 60,
 		SignedHeaders: sortedHeaders.join(";").toLowerCase()
 	}
-	, opts = assignDashCase(optsPrefix ? out : {}, _opts)
+	, opts = assignDashCase(optsPrefix ? out : {}, _opts, "")
 	, query = Object.keys(opts).map(queryEnc).sort().join("&") || ""
 	, canonical = [
 		method,
@@ -68,23 +68,22 @@ function awsSig(s3, method, path, _opts, optsPrefix, headers, longDate, contentH
 		out.SignedHeaders,
 		contentHash
 	].join("\n")
+	, signKey = hmac(hmac(hmac(hmac("AWS4" + s3.secret, shortDate), s3.region), "s3"), "aws4_request")
 	, signString = [
 		ALGO,
 		longDate,
 		scope,
 		hash(canonical)
 	].join("\n")
-	, signKey = hmac(hmac(hmac(hmac("AWS4" + s3.secret, shortDate), s3.region), "s3"), "aws4_request")
 
 	out.sig = hmac(signKey, signString).toString("hex").toLowerCase()
 	out.url = s3.protocol + "://" + s3.endpoint + path + (query ? "?" + query : "") + (optsPrefix ? "&X-Amz-Signature=" + out.sig : "")
 	out.auth = ALGO + " Credential=" + out.Credential + ", SignedHeaders=" + out.SignedHeaders + ", Signature=" + out.sig
 	return out
-	function assignDashCase(target, source) {
+	function assignDashCase(target, source, prefix) {
 		if (source) Object.keys(source).forEach(function(key) {
-			target[
-				key === "expires" ? "Expires" : key.replace(/[A-Z]/g, "-$&").toLowerCase().replace(/^-/, "")
-			] = source[key]
+			var headerName = prefix + (key === "expires" ? "Expires" : key.replace(/[A-Z]/g, "-$&").toLowerCase().replace(/^-/, ""))
+			if (!isObj(source[key])) target[headerName] = source[key]
 		})
 		return target
 	}

@@ -43,13 +43,28 @@ describe("S3 live on {0} {1}", [
 		})
 	})
 
+	it("should upload a file with metadata", function(assert) {
+		assert.setTimeout(5000)
+		s3client.put("test-user-metadata.txt", "Metadata", {
+			"x-amz-meta-b": "B",
+			meta: {
+				hello: "a"
+			}
+		}, function(err, data) {
+			assert.notOk(err)
+			assert.end()
+		})
+	})
+
 	it("should stat file", [
+		[ fileName, null, {"size":content.length} ],
 		[ "none.txt", Error("The specified key does not exist."), undefined ],
 	], function(name, expErr, expData, assert) {
 		assert.setTimeout(5000)
-		s3client.stat("none.txt", null, function(err, data) {
+		s3client.stat(name, function(err, data) {
 			assert.equal(err, expErr)
-			assert.equal(data, expData)
+			if (expData) assert.own(data, expData)
+			else assert.equal(data, expData)
 			assert.end()
 		})
 	})

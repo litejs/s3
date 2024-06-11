@@ -47,6 +47,9 @@ require("http").createServer(function(req, res) {
 s3client.stat("test/")
 s3client.list("test/", { maxKeys: 20 })
 s3client.stat("test/hello.txt")
+s3client.put("test/hello.txt", "Hello world!", {
+	meta: { key: "User custom metadata" },
+}, function(err) {})
 s3client.del("test/hello.txt")
 ```
 

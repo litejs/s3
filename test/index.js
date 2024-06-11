@@ -240,6 +240,31 @@ describe("S3 Mock", function() {
 		mock.tick()
 	})
 
+	it("should upload a file with user meta", function(assert, mock) {
+		var s3client = mockedClient(mock, {bucket: "buck-1"})
+
+		s3client.put("file1.txt", "Hello world", { meta: { hello: "world" } }, function(err, data) {
+			assert.notOk(err)
+			assert.own(s3client.client.request, {
+				called: 1,
+				errors: 0
+			})
+			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/buck-1/file1.txt", {
+				method: "PUT",
+				headers: {
+					"host": "s3-eu-central-1.amazonaws.com",
+					"Content-Length": 11,
+					"x-amz-date": "20220423T130929Z",
+					"x-amz-content-sha256": "64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c",
+					"x-amz-meta-hello": "world",
+					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date;x-amz-meta-hello, Signature=165648bd217c0e8a131fc06a65f95b85936fa15918ad7ee8e865848438e2c865"
+				}
+			})
+			assert.end()
+		})
+		mock.tick()
+	})
+
 	it("should list files", function(assert, mock) {
 		var s3client = mockedClient(mock, {bucket: "buck-list"})
 
