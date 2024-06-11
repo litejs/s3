@@ -1,6 +1,6 @@
 {
   "name": "@litejs/s3",
-  "version": "24.1.0",
+  "version": "24.6.0",
   "description": "Small S3 client",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
