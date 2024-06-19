@@ -17,21 +17,7 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
     - run: npm install
+    - name: Export variables and secrets
+      run: jq -r 'to_entries[]|"\(.key)=\(.value)"' <<< '${{toJSON(secrets)}}${{toJSON(vars)}}' >> $GITHUB_ENV
     - run: npx lj t test/live.js
-      env:
-        S3_AWS_ID: ${{secrets.S3_AWS_ID}}
-        S3_AWS_SECRET: ${{secrets.S3_AWS_SECRET}}
-        S3_AWS_ENDPOINT: ${{vars.S3_AWS_ENDPOINT}}
-        S3_GOOG_ID: ${{secrets.S3_GOOG_ID}}
-        S3_GOOG_SECRET: ${{secrets.S3_GOOG_SECRET}}
-        S3_GOOG_ENDPOINT: ${{vars.S3_GOOG_ENDPOINT}}
-        S3_R2_ID: ${{secrets.S3_R2_ID}}
-        S3_R2_SECRET: ${{secrets.S3_R2_SECRET}}
-        S3_R2_ENDPOINT: ${{vars.S3_R2_ENDPOINT}}
-        S3_B2_ID: ${{secrets.S3_B2_ID}}
-        S3_B2_SECRET: ${{secrets.S3_B2_SECRET}}
-        S3_B2_ENDPOINT: ${{vars.S3_B2_ENDPOINT}}
-        S3_STORJ_ID: ${{secrets.S3_STORJ_ID}}
-        S3_STORJ_SECRET: ${{secrets.S3_STORJ_SECRET}}
-        S3_STORJ_ENDPOINT: ${{vars.S3_STORJ_ENDPOINT}}
 
