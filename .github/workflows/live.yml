@@ -20,4 +20,9 @@ jobs:
     - name: Export variables and secrets
       run: jq -r 'to_entries[]|"\(.key)=\(.value)"' <<< '${{toJSON(secrets)}}${{toJSON(vars)}}' >> $GITHUB_ENV
     - run: npx lj t test/live.js
+      continue-on-error: true
+      id: firstRun
+    - run: npx lj t test/live.js
+      if: steps.firstRun.outcome == 'failure'
+      name: Retry
 
