@@ -139,7 +139,7 @@ describe("S3 Mock", function() {
 		async function run() {
 			var s3client = mockedClient(mock, {bucket: "buck-1"})
 			, stat = await s3client.stat()
-			assert.equal(stat, {"size":2,"mtime":new Date("2022-04-23T13:09:29.960Z"),"etag":undefined})
+			assert.equal(stat, {"size":2,"mtime":new Date("2022-04-23T13:09:29.960Z"),"content-length":2,"content-type":"application/xml"})
 		}
 		return run()
 	})

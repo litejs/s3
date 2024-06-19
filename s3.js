@@ -138,11 +138,10 @@ function req(method, data, path, opts, next) {
 					)
 					return reject(Error(data.message || data))
 				}
-				data = method === "HEAD" ? {
+				data = method === "HEAD" ? Object.assign({
 					size: +res.headers["content-length"],
 					mtime: new Date(res.headers["last-modified"]),
-					etag: res.headers.etag
-				} : parseXml(data)
+				}, res.headers) : parseXml(data)
 				resolve(data.listBucketResult || data.error || data)
 			})
 		}

@@ -44,17 +44,23 @@ describe("S3 live on {0} {1}", [
 		})
 	})
 
-	it("should upload a file with metadata", function(assert) {
+	it("should upload a file with metadata", async function(assert) {
 		assert.setTimeout(5000)
-		s3client.put("test-user-metadata.txt", "Metadata", {
+		await s3client.put("test-user-metadata.txt", "Metadata", {
 			"x-amz-meta-b": "B",
 			meta: {
 				hello: "a"
 			}
-		}, function(err, data) {
-			assert.notOk(err)
-			assert.end()
 		})
+		var head = await s3client.stat("test-user-metadata.txt")
+
+		// AWS accepts custom metadata in url
+		// -> PUT /test-metadata.txt?x-amz-meta-a=A { 'x-amz-meta-b': 'B' }
+		// <- HEAD /test-metadata.txt { 'x-amz-meta-a': 'A', 'x-amz-meta-b': 'B' }
+		// Other providers do not
+		// assert.equal(head["x-amz-meta-b"], "B")
+		assert.equal(head["x-amz-meta-hello"], "a")
+		await s3client.del("test-user-metadata.txt")
 	})
 
 	it("should stat file", [
