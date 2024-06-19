@@ -10,6 +10,7 @@ describe("S3 live on {0} {1}", [
 	//[ "STORJ", "global", false ],
 ], function(provider, region, virtualStyle) {
 	var S3 = require("..")
+	, child = require("child_process")
 	, fs = require("fs")
 	, bucket = "litejs-test"
 	, ID = process.env["S3_" + provider + "_ID"]
@@ -85,6 +86,32 @@ describe("S3 live on {0} {1}", [
 		await s3client.get(fileName, writeTo)
 		assert.equal(fs.readFileSync(name, "utf8"), content)
 		fs.unlinkSync(name)
+	})
+
+	describe("Presigned URL", function() {
+		var content = "Hello " + Math.random()
+		, fileName = "gh-action/signed-url.txt"
+
+		it("should put file", function(assert) {
+			var url = s3client.sign("PUT", fileName, { expires: 5*60 }).url
+			assert.setTimeout(5000)
+			assert.equal(child.execSync("curl -s -X PUT -H 'Content-Type: text/plain' -d '" + content + "' '" + url + "'").toString("utf8"), "")
+			assert.end()
+		})
+
+		it("should get file", function(assert) {
+			var url = s3client.sign("GET", fileName).url
+			assert.setTimeout(5000)
+			assert.equal(child.execSync("curl -s '" + url + "'").toString("utf8"), content)
+			assert.end()
+		})
+
+		it("should delete file", function(assert) {
+			var url = s3client.sign("DELETE", fileName).url
+			assert.setTimeout(5000)
+			assert.equal(child.execSync("curl -s -X DELETE '" + url + "'").toString("utf8"), "")
+			assert.end()
+		})
 	})
 
 	it("should get error on streaming non-existing file", async function(assert, mock) {

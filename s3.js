@@ -30,8 +30,11 @@ S3.prototype = {
 	put: function(path, data, opts, next) {
 		return req.call(this, "PUT", data, path, opts, next)
 	},
+	sign: function(method, path, opts, contentHash) {
+		return awsSig(this, method, path, opts, "X-Amz-", { host: this.endpoint }, awsDate(), contentHash || "UNSIGNED-PAYLOAD")
+	},
 	url: function(path, opts) {
-		return awsSig(this, "GET", path, opts, "X-Amz-", { host: this.endpoint }, awsDate(), "UNSIGNED-PAYLOAD").url
+		return this.sign("GET", path, opts).url
 	}
 }
 
