@@ -31,7 +31,7 @@ S3.prototype = {
 		return req.call(this, "PUT", data, path, opts, next)
 	},
 	sign: function(method, path, opts, contentHash) {
-		return awsSig(this, method, path, opts, "X-Amz-", { host: this.endpoint }, awsDate(), contentHash || "UNSIGNED-PAYLOAD")
+		return awsSig(this, method, path, opts, "X-Amz-", {}, awsDate(), contentHash || "UNSIGNED-PAYLOAD")
 	},
 	url: function(path, opts) {
 		return this.sign("GET", path, opts).url
@@ -50,6 +50,7 @@ function awsDate() {
 }
 function awsSig(s3, method, path, _opts, optsPrefix, headers, longDate, contentHash) {
 	path = (path || "").replace(/^\/*/, (s3.bucket ? "/" + s3.bucket + "/" : "/"))
+	headers.host = s3.endpoint
 	var ALGO = "AWS4-HMAC-SHA256"
 	, shortDate = longDate.slice(0, 8)
 	, scope = shortDate + "/" + s3.region + "/s3/aws4_request"
@@ -106,7 +107,6 @@ function req(method, data, path, opts, next) {
 	, longDate = awsDate()
 	, contentHash = data ? hash(data) : "UNSIGNED-PAYLOAD"
 	, headers = {
-		host: s3.endpoint,
 		"x-amz-date": longDate,
 		"x-amz-content-sha256": contentHash
 	}
