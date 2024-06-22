@@ -63,6 +63,15 @@ describe("S3 live on {0} {1}", [
 		await s3client.del("test-user-metadata.txt")
 	})
 
+	it("should list files", function(assert) {
+		assert.setTimeout(5000)
+		s3client.list("", function(err, data) {
+			assert.notOk(err)
+			assert.own(data, { name: "litejs-test", prefix: "" })
+			assert.end()
+		})
+	})
+
 	it("should stat file", [
 		[ fileName, null, {"size":content.length} ],
 		[ "none.txt", Error("The specified key does not exist."), undefined ],

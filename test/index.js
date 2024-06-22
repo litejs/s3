@@ -266,38 +266,39 @@ describe("S3 Mock", function() {
 	})
 
 	it("should list files", function(assert, mock) {
+		assert.planned = 7
 		var s3client = mockedClient(mock, {bucket: "buck-list"})
+		, expectedData = {
+			name: "buck-list",
+			prefix: "",
+			nextContinuationToken: "18AYKGrNU+eEyBpQpLqmP7sa97tujeSo6WioT9GWV9zwYJpFFPgWpWURUW/dtYLR3eU5JD6IGyi+yR8gW5AobRQ==",
+			keyCount: "2",
+			maxKeys: "2",
+			isTruncated: "true",
+			contents: [
+				{
+					"key": ".env",
+					"lastModified": "2022-04-19T11:43:10.000Z",
+					"eTag": "&quot;f030741faa47308e37d5e0671c5a4228&quot;",
+					"size": "6717",
+					"storageClass": "STANDARD"
+				},
+				{
+					"key": "hello.txt",
+					"lastModified": "2022-03-14T13:15:29.000Z",
+					"eTag": "&quot;d41d8cd98f00b204e9800998ecf8427e&quot;",
+					"boo": true,
+					"arr": ["0","1"],
+					"size": "0",
+					"storageClass": "STANDARD"
+				}
+			]
+		}
 
-		s3client.list("", null, function(err, data) {
+		s3client.list("", function(err, data) {
 			assert.notOk(err)
-			assert.own({
-				name: "buck-list",
-				prefix: "",
-				nextContinuationToken: "18AYKGrNU+eEyBpQpLqmP7sa97tujeSo6WioT9GWV9zwYJpFFPgWpWURUW/dtYLR3eU5JD6IGyi+yR8gW5AobRQ==",
-				keyCount: "2",
-				maxKeys: "2",
-				isTruncated: "true",
-				contents: [
-					{
-						"Key": ".env",
-						"LastModified": "2022-04-19T11:43:10.000Z",
-						"ETag": "&quot;f030741faa47308e37d5e0671c5a4228&quot;",
-						"Size": "6717",
-						"StorageClass": "STANDARD"
-					},
-					{
-						"Key": "hello.txt",
-						"LastModified": "2022-03-14T13:15:29.000Z",
-						"ETag": "&quot;d41d8cd98f00b204e9800998ecf8427e&quot;",
-						"Size": "0",
-						"StorageClass": "STANDARD"
-					}
-				]
-			})
-			assert.own(s3client.client.request, {
-				called: 1,
-				errors: 0
-			})
+			assert.own(data, expectedData)
+			assert.equal(s3client.client.request.errors, 0)
 			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/buck-list/?list-type=2&max-keys=10&prefix=", {
 				method: "GET",
 				headers: {
@@ -307,7 +308,10 @@ describe("S3 Mock", function() {
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=94ff79fa807c4b865d476c359e54f58d279a6525fb1a0f1e0ecf0fd5f80bd61c"
 				}
 			})
-			assert.end()
+		})
+		s3client.list("", {}, function(err, data) {
+			assert.notOk(err)
+			assert.own(data, expectedData)
 		})
 		mock.tick()
 	})
