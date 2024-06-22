@@ -1,8 +1,8 @@
 
 
 describe("S3 live on {0} {1}", [
-	[ "AWS", "eu-north-1", false ],
 	[ "AWS", "eu-north-1", true ],
+	[ "AWS", "eu-north-1", false ],
 	[ "R2", "auto", false ],
 	[ "B2", "eu-central-003", false ],
 	[ "B2", "eu-central-003", true ],

@@ -31,7 +31,9 @@ S3.prototype = {
 		return req.call(this, "PUT", data, path, opts, next)
 	},
 	sign: function(method, path, opts, contentHash) {
-		return awsSig(this, method, path, opts, "X-Amz-", {}, awsDate(), contentHash || "UNSIGNED-PAYLOAD")
+		var signed = awsSig(this, method, path, opts, "X-Amz-", {}, awsDate(), contentHash || "UNSIGNED-PAYLOAD")
+		signed.url += "&X-Amz-Signature=" + signed.Signature
+		return signed
 	},
 	url: function(path, opts) {
 		return this.sign("GET", path, opts).url
@@ -80,9 +82,9 @@ function awsSig(s3, method, path, _opts, optsPrefix, headers, longDate, contentH
 		hash(canonical)
 	].join("\n")
 
-	out.sig = hmac(signKey, signString).toString("hex").toLowerCase()
-	out.url = s3.protocol + "://" + s3.endpoint + path + (query ? "?" + query : "") + (optsPrefix ? "&X-Amz-Signature=" + out.sig : "")
-	out.auth = ALGO + " Credential=" + out.Credential + ", SignedHeaders=" + out.SignedHeaders + ", Signature=" + out.sig
+	out.Signature = hmac(signKey, signString).toString("hex").toLowerCase()
+	out.url = s3.protocol + "://" + s3.endpoint + path + (query ? "?" + query : "")
+	out.auth = ALGO + " Credential=" + out.Credential + ", SignedHeaders=" + out.SignedHeaders + ", Signature=" + out.Signature
 	return out
 	function assignDashCase(target, source, prefix) {
 		if (source) Object.keys(source).forEach(function(key) {
