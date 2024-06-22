@@ -21,6 +21,10 @@ function S3(opts) {
 
 S3.prototype = {
 	list: function(path, opts, next) {
+		if (isFn(opts)) {
+			next = opts
+			opts = null
+		}
 		return this.get("", Object.assign({
 			prefix: path || "",
 			listType: 2,
