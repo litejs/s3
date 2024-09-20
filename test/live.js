@@ -157,9 +157,13 @@ describe("S3 live on {0} {1}", [
 
 	it("should delete a file", function(assert) {
 		assert.setTimeout(5000)
+		assert.plan(2)
+		s3client.del("non-existing-" + fileName, function(err) {
+			if (provider === "GOOG") assert.ok(err)
+			else assert.notOk(err)
+		})
 		s3client.del(fileName, function(err) {
 			assert.notOk(err)
-			assert.end()
 		})
 	})
 })
