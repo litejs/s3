@@ -1,8 +1,5 @@
 
 var crypto = require("crypto")
-, expectArray = {
-	contents: true
-}
 
 module.exports = S3
 S3.getXml = getXml
@@ -161,7 +158,7 @@ function parseXml(str) {
 		key = val[1].toLowerCase() + val[2]
 		val = val[3] != null ? parseXml(val[3]) : true
 		if (Array.isArray(json[key])) json[key].push(val)
-		else json[key] = json[key] != null ? [json[key], val] : expectArray[key] ? [val] : val
+		else json[key] = json[key] != null ? [json[key], val] : key === "contents" ? [val] : key === "keyCount" || key === "maxKeys" ? +val : val
 	}
 	return key ? json : str
 }

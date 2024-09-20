@@ -274,8 +274,8 @@ describe("S3 Mock", function() {
 				name: "buck-list",
 				prefix: "",
 				nextContinuationToken: "18AYKGrNU+eEyBpQpLqmP7sa97tujeSo6WioT9GWV9zwYJpFFPgWpWURUW/dtYLR3eU5JD6IGyi+yR8gW5AobRQ==",
-				keyCount: "2",
-				maxKeys: "2",
+				keyCount: 2,
+				maxKeys: 2,
 				isTruncated: "true",
 				contents: [
 					{
@@ -307,6 +307,16 @@ describe("S3 Mock", function() {
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=94ff79fa807c4b865d476c359e54f58d279a6525fb1a0f1e0ecf0fd5f80bd61c"
 				}
 			})
+			assert.end()
+		})
+		mock.tick()
+	})
+
+	it("should list files without options", function(assert, mock) {
+		var s3client = mockedClient(mock, {bucket: "buck-list"})
+
+		s3client.list("", function(err, data) {
+			assert.notOk(err)
 			assert.end()
 		})
 		mock.tick()

@@ -4,6 +4,7 @@ describe("S3 live on {0} {1}", [
 	[ "AWS", "eu-north-1", true ],
 	[ "AWS", "eu-north-1", false ],
 	[ "R2", "auto", false ],
+	[ "R2", "auto", true ],
 	[ "B2", "eu-central-003", false ],
 	[ "B2", "eu-central-003", true ],
 	[ "GOOG", "auto", false ],
@@ -81,6 +82,17 @@ describe("S3 live on {0} {1}", [
 		s3client.get(fileName, function(err, data) {
 			assert.notOk(err)
 			assert.equal(data, content)
+			assert.end()
+		})
+	})
+
+	it("should list files", function(assert) {
+		assert.setTimeout(5000)
+		s3client.list("", null, function(err, data) {
+			assert.notOk(err)
+			assert.type(data, "object")
+			assert.type(data.contents, "array")
+			assert.ok(data.keyCount > 0)
 			assert.end()
 		})
 	})
