@@ -75,15 +75,13 @@ function awsSig(s3, method, path, _opts, optsPrefix, headers, longDate, contentH
 		out.SignedHeaders,
 		contentHash
 	].join("\n")
-	, signKey = hmac(hmac(hmac(hmac("AWS4" + s3.secret, shortDate), s3.region), "s3"), "aws4_request")
-	, signString = [
+
+	out.Signature = hmac(hmac(hmac(hmac(hmac("AWS4" + s3.secret, shortDate), s3.region), "s3"), "aws4_request"), [
 		ALGO,
 		longDate,
 		scope,
 		hash(canonical)
-	].join("\n")
-
-	out.Signature = hmac(signKey, signString).toString("hex").toLowerCase()
+	].join("\n")).toString("hex").toLowerCase()
 	out.url = s3.protocol + "://" + s3.endpoint + path + (query ? "?" + query : "")
 	out.auth = ALGO + " Credential=" + out.Credential + ", SignedHeaders=" + out.SignedHeaders + ", Signature=" + out.Signature
 	return out
