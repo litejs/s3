@@ -1,6 +1,6 @@
 {
   "name": "@litejs/s3",
-  "version": "24.6.0",
+  "version": "24.9.0",
   "description": "Small S3 client",
   "license": "MIT",
   "author": "Lauri Rooden <lauri@rooden.ee>",
@@ -16,6 +16,6 @@
     "test": "lj t test/index.js"
   },
   "devDependencies": {
-    "@litejs/cli": "24.6.1"
+    "@litejs/cli": "24.6.2"
   }
 }
