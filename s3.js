@@ -8,6 +8,7 @@ function S3(opts) {
 	if (!(this instanceof S3)) return new S3(opts)
 	Object.assign(this, {
 		protocol: "https",
+		region: "auto",
 		client: require(opts.protocol === "http" ? "http" : "https"),
 		endpoint: "s3." + opts.region + ".amazonaws.com",
 		del: req.bind(this, "DELETE", null),
