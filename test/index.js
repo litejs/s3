@@ -383,14 +383,28 @@ describe("S3 Mock", function() {
 		})
 		assert.end()
 	})
-	it("should get xml", function(assert, mock) {
+	it("should make xml", function(assert, mock) {
+		function makeXml(root, json) {
+			return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + nest(root, json || "", " xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"")
+			function nest(key, val, attrs) {
+				return "<" + key + attrs + ">" +
+					(isObj(val) || Array.isArray(val) ? Object.entries(val).map(entryeMap).join("") : val) +
+					"</" + key + ">"
+			}
+			function entryeMap(e) {
+				return nest(e[0], e[1], "")
+			}
+		}
+		function isObj(obj) {
+			return !!obj && obj.constructor === Object
+		}
 
 		assert.equal(
-			S3.getXml("ListBucketResult"),
+			makeXml("ListBucketResult"),
 			'<?xml version="1.0" encoding="UTF-8"?><ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"></ListBucketResult>'
 		)
 		assert.equal(
-			S3.getXml("Error", {Code: 123, Message: "Nothing here"}),
+			makeXml("Error", {Code: 123, Message: "Nothing here"}),
 			'<?xml version="1.0" encoding="UTF-8"?><Error xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Code>123</Code><Message>Nothing here</Message></Error>'
 		)
 		assert.end()

@@ -2,7 +2,6 @@
 var crypto = require("crypto")
 
 module.exports = S3
-S3.getXml = getXml
 
 function S3(opts) {
 	if (!(this instanceof S3)) return new S3(opts)
@@ -162,17 +161,6 @@ function parseXml(str) {
 		else json[key] = json[key] != null ? [json[key], val] : key === "contents" ? [val] : key === "keyCount" || key === "maxKeys" ? +val : val
 	}
 	return key ? json : str
-}
-function getXml(root, json) {
-	return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + nest(root, json || "", " xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"")
-	function nest(key, val, attrs) {
-		return "<" + key + attrs + ">" +
-			(isObj(val) || Array.isArray(val) ? Object.entries(val).map(entryeMap).join("") : val) +
-			"</" + key + ">"
-	}
-	function entryeMap(e) {
-		return nest(e[0], e[1], "")
-	}
 }
 function isFn(fn) {
 	return typeof fn === "function"
