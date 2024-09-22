@@ -86,6 +86,19 @@ describe("S3 live on {0} {1}", [
 		})
 	})
 
+	it("should get part of file from bucket", function(assert) {
+		assert.setTimeout(5000)
+		assert.plan(4)
+		s3client.get(fileName, { Range: "bytes=0-4" }, function(err, data) {
+			assert.notOk(err)
+			assert.equal(data, content.slice(0, 5))
+		})
+		s3client.get(fileName, { Range: "bytes=-5" }, function(err, data) {
+			assert.notOk(err)
+			assert.equal(data, content.slice(-5))
+		})
+	})
+
 	it("should list files", function(assert) {
 		assert.setTimeout(5000)
 		s3client.list("", null, function(err, data) {
