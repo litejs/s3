@@ -1,44 +1,41 @@
 
 var crypto = require("crypto")
 
-module.exports = S3
 
-function S3(opts) {
-	if (!(this instanceof S3)) return new S3(opts)
-	Object.assign(this, {
+module.exports = function S3(opts) {
+	var s3 = this
+	if (!(s3 instanceof S3)) return new S3(opts)
+	Object.assign(s3, {
 		protocol: "https",
 		region: "auto",
 		client: require(opts.protocol === "http" ? "http" : "https"),
 		endpoint: "s3." + opts.region + ".amazonaws.com",
-		del: req.bind(this, "DELETE", null),
-		get: req.bind(this, "GET", null),
-		stat: req.bind(this, "HEAD", null)
-	}, opts)
-}
-
-S3.prototype = {
-	list: function(path, opts, next) {
-		if (isFn(opts)) {
-			next = opts
-			opts = null
+		del: req.bind(s3, "DELETE", null),
+		get: req.bind(s3, "GET", null),
+		list: function(path, opts, next) {
+			if (isFn(opts)) {
+				next = opts
+				opts = null
+			}
+			return s3.get("", Object.assign({
+				prefix: path || "",
+				listType: 2,
+				maxKeys: 10
+			}, opts), next)
+		},
+		put: function(path, data, opts, next) {
+			return req.call(s3, "PUT", data, path, opts, next)
+		},
+		sign: function(method, path, opts, contentHash) {
+			var signed = awsSig(s3, method, path, opts, "X-Amz-", {}, awsDate(), contentHash || "UNSIGNED-PAYLOAD")
+			signed.url += "&X-Amz-Signature=" + signed.Signature
+			return signed
+		},
+		stat: req.bind(s3, "HEAD", null),
+		url: function(path, opts) {
+			return s3.sign("GET", path, opts).url
 		}
-		return this.get("", Object.assign({
-			prefix: path || "",
-			listType: 2,
-			maxKeys: 10
-		}, opts), next)
-	},
-	put: function(path, data, opts, next) {
-		return req.call(this, "PUT", data, path, opts, next)
-	},
-	sign: function(method, path, opts, contentHash) {
-		var signed = awsSig(this, method, path, opts, "X-Amz-", {}, awsDate(), contentHash || "UNSIGNED-PAYLOAD")
-		signed.url += "&X-Amz-Signature=" + signed.Signature
-		return signed
-	},
-	url: function(path, opts) {
-		return this.sign("GET", path, opts).url
-	}
+	}, opts)
 }
 
 function hash(data) {
