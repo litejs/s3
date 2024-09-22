@@ -45,6 +45,18 @@ describe("S3 live on {0} {1}", [
 		})
 	})
 
+	it("should copy a file", async function(assert) {
+		// Path-style requests do not support Directory buckets
+		assert.setTimeout(5000)
+		var copyName = "copy-of-" + fileName
+		await s3client.put(copyName, null, {
+			"copy-source": "/" + bucket + "/" + fileName
+		})
+		assert.equal(await s3client.get(copyName), content)
+		await s3client.del(copyName)
+		assert.end()
+	})
+
 	it("should upload a file with metadata", async function(assert) {
 		assert.setTimeout(5000)
 		await s3client.put("test-user-metadata.txt", "Metadata", {
