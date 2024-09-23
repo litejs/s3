@@ -84,7 +84,7 @@ function awsSig(s3, method, path, _opts, optsPrefix, headers, longDate, contentH
 	return out
 	function assignDashCase(target, source, prefix) {
 		if (source) Object.keys(source).forEach(function(key) {
-			var headerName = prefix + (key === "expires" ? "Expires" : key.replace(/[A-Z]/g, "-$&").toLowerCase().replace(/^-/, ""))
+			var headerName = prefix + (key === "expires" ? "Expires" : key.replace(/\B[A-Z]/g, "-$&").toLowerCase())
 			if (!isObj(source[key])) target[headerName] = source[key]
 		})
 		return target
