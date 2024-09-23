@@ -97,12 +97,21 @@ describe("S3 live on {0} {1}", [
 		})
 	})
 
-	it("should stream a file from bucket", async function(assert) {
+	it("should stream a file", async function(assert) {
 		assert.setTimeout(5000)
-		var name = "./" + fileName
+		var name = "./stream-" + fileName
 		, writeTo = fs.createWriteStream(name)
 		await s3client.get(fileName, writeTo)
 		assert.equal(fs.readFileSync(name, "utf8"), content)
+
+		var readFrom = fs.createReadStream(name)
+		, stat = fs.statSync(name)
+		readFrom.length = stat.size
+
+		await s3client.put("streamed-" + fileName, readFrom)
+
+		assert.equal(await s3client.get("streamed-" + fileName), content)
+
 		fs.unlinkSync(name)
 	})
 

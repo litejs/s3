@@ -127,10 +127,14 @@ describe("S3 Mock", function() {
 
 	it("should get a stream from bucket", function(assert, mock) {
 		var s3client = mockedClient(mock, { bucket: "buck-1", userAgent: "Dummy/1.0" })
+		, streamReadable = { pipe: mock.fn(), read: mock.fn("Hello") }
 		, stream = { pipe: mock.fn(), write: mock.fn() }
+
+		s3client.put("file1.txt", streamReadable)
 		s3client.get("file1.txt", stream)
 
 		mock.tick()
+		assert.equal(streamReadable.pipe.called, 1)
 		assert.equal(stream.write.calls[0].args[0], "Hello")
 		assert.end()
 	})

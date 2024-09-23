@@ -103,12 +103,12 @@ function req(method, data, path, opts, next) {
 	}
 	var s3 = this
 	, longDate = awsDate()
-	, contentHash = data ? hash(data) : "UNSIGNED-PAYLOAD"
+	, contentHash = data && !isStream(data) ? hash(data) : "UNSIGNED-PAYLOAD"
 	, headers = {
 		"x-amz-date": longDate,
 		"x-amz-content-sha256": contentHash
 	}
-	if (data) {
+	if (data && data.length) {
 		headers["Content-Length"] = data.length
 	}
 	var signed = awsSig(s3, method, path, opts, "", headers, longDate, contentHash)
@@ -118,7 +118,9 @@ function req(method, data, path, opts, next) {
 	if (!isFn(next)) return new Promise(makeReq)
 	makeReq(next.bind(null, null), next)
 	function makeReq(resolve, reject) {
-		s3.client.request(signed.url, { method: method, headers: headers }, handle).end(data)
+		var req = s3.client.request(signed.url, { method: method, headers: headers }, handle)
+		if (isStream(data)) data.pipe(req)
+		else req.end(data)
 		function handle(res) {
 			res.on("error", reject)
 			if (res.statusCode === 200 && isStream(next)) {
