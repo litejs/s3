@@ -72,7 +72,7 @@ describe("S3 Mock", function() {
 
 	it("should accept {0} protocol", "http,https", function(proto, assert) {
 		var s3client = new S3({ protocol: proto })
-		assert.strictEqual(s3client.client, require(proto))
+		assert.strictEqual(s3client.protocol, proto)
 		assert.end()
 	})
 
