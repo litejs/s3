@@ -11,17 +11,27 @@ jobs:
     - run: npx c8 -r lcovonly -r text --check-coverage --100 npm test
     - run: node --import=@litejs/cli/test.js test/load.mjs
     - run: npm run lint
+    - run: npx lj lint
     - uses: coverallsapp/github-action@v2
       name: Upload to coveralls.io
       with:
         github-token: ${{ github.token }}
+  Bun:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: oven-sh/setup-bun@v2
+    - run: bun i
+    - run: bun x lj t test/index.js
   Test:
     strategy:
       matrix:
         include:
-        - { node: 8,  os: windows-latest, arch: x86 }
-        - { node: 12, os: macos-latest,   arch: x64 }
-        - { node: 16, os: ubuntu-latest,  arch: x64 }
+        - { node: 8,  os: ubuntu-24.04,   arch: x86 }
+        - { node: 10, os: windows-2022,   arch: x86 }
+        - { node: 12, os: macos-13,       arch: x64 }
+        - { node: 16, os: ubuntu-24.04,   arch: x64 }
+        - { node: 22, os: macos-14,       arch: arm64 }
     runs-on: ${{ matrix.os }}
     name: Node ${{matrix.node}} (${{matrix.os}} ${{matrix.arch}})
     steps:
@@ -60,7 +70,10 @@ jobs:
       with:
         registry-url: https://registry.npmjs.org/
     - run: |
-        gh release create $TAG --title $TAG --notes "$(git tag -l --format='%(subject)%0a%0a%(contents:body)' $TAG)"
+        MSG=$(git log -1 --no-show-signature --format=%B $TAG)
+        TITLE=$(echo "$MSG" | head -n 1)
+        NOTES=$(echo "$MSG" | tail -n +2)
+        gh release create $TAG --title "$TITLE" --notes "$NOTES"
         gh run list --json databaseId  -q '.[20:]|.[].databaseId' --limit 100 | xargs -I{} gh run delete "{}"
         [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && echo "PUBLISH=latest" >> $GITHUB_ENV || echo "PUBLISH=next" >> $GITHUB_ENV
       env:
