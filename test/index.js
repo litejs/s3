@@ -282,13 +282,13 @@ describe("S3 Mock", function() {
 				nextContinuationToken: "18AYKGrNU+eEyBpQpLqmP7sa97tujeSo6WioT9GWV9zwYJpFFPgWpWURUW/dtYLR3eU5JD6IGyi+yR8gW5AobRQ==",
 				keyCount: 2,
 				maxKeys: 2,
-				isTruncated: "true",
+				isTruncated: true,
 				contents: [
 					{
 						"key": ".env",
 						"lastModified": "2022-04-19T11:43:10.000Z",
 						"eTag": "&quot;f030741faa47308e37d5e0671c5a4228&quot;",
-						"size": "6717",
+						"size": 6717,
 						"storageClass": "STANDARD"
 					},
 					{
@@ -296,8 +296,8 @@ describe("S3 Mock", function() {
 						"lastModified": "2022-03-14T13:15:29.000Z",
 						"eTag": "&quot;d41d8cd98f00b204e9800998ecf8427e&quot;",
 						"boo": true,
-						"arr": ["0", "1"],
-						"size": "0",
+						"arr": [0, 1],
+						"size": 0,
 						"storageClass": "STANDARD"
 					}
 				]
@@ -330,7 +330,7 @@ describe("S3 Mock", function() {
 				prefix: "",
 				keyCount: 1,
 				maxKeys: 11,
-				isTruncated: "false",
+				isTruncated: false,
 				contents: [
 					{
 						"key":"streamed-gh-action-test1.txt",
@@ -338,7 +338,7 @@ describe("S3 Mock", function() {
 						"eTag":"&quot;f149fa32b1643ea05b6d1c91a5851a23&quot;",
 						"checksumAlgorithm":"CRC64NVME",
 						"checksumType":"FULL_OBJECT",
-						"size":"24",
+						"size":24,
 						"storageClass":"STANDARD"
 					}
 				]

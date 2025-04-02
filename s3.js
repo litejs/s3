@@ -142,9 +142,9 @@ module.exports = function S3(opts) {
 		, re = /<(\w)([-\w]*)(?:\/|[^>]*>((?:(?!<\1\2)[\s\S])*)<\/\1\2)>/gm
 		for (; (val = re.exec(str)); ) {
 			key = val[1].toLowerCase() + val[2]
-			val = val[3] != null ? parseXml(val[3]) : true
+			val = val[3] === "" ? "" : val[3] == null || val[3] === "true" ? true : val[3] === "false" ? false : val[3] == +val[3] ? +val[3] : parseXml(val[3])
 			if (Array.isArray(json[key])) json[key].push(val)
-			else json[key] = json[key] != null ? [json[key], val] : key === "contents" ? [val] : key === "keyCount" || key === "maxKeys" ? +val : val
+			else json[key] = json[key] != null ? [json[key], val] : key === "contents" ? [val] : val
 		}
 		return key ? json : str
 	}
