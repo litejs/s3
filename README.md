@@ -51,7 +51,7 @@ s3client.put("test/hello.txt", "Hello world!", {
 s3client.del("test/hello.txt")
 ```
 
-> Copyright (c) 2022-2024 Lauri Rooden &lt;lauri@rooden.ee&gt;  
+> Copyright (c) 2022-2025 Lauri Rooden &lt;lauri@rooden.ee&gt;  
 [MIT License](https://litejs.com/MIT-LICENSE.txt) |
 [GitHub repo](https://github.com/litejs/s3) |
 [npm package](https://npmjs.org/package/@litejs/s3) |

@@ -7,6 +7,9 @@ on:
   workflow_run:
     workflows: [ Test ]
     types: [ completed ]
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 jobs:
   Live:
     runs-on: ubuntu-latest
