@@ -97,6 +97,16 @@ describe("S3 live on {0} {1}", [
 		})
 	})
 
+	it("should list files with prefix", function(assert) {
+		assert.setTimeout(5000)
+		s3client.list("not-existing/", null, function(err, data) {
+			assert.notOk(err)
+			assert.type(data, "object")
+			assert.equal(data.keyCount, 0)
+			assert.end()
+		})
+	})
+
 	it("should stream a file", async function(assert) {
 		assert.setTimeout(5000)
 		var name = "./stream-" + fileName

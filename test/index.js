@@ -18,7 +18,9 @@ describe("S3 Mock", function() {
 		"https://s3-eu-central-1.amazonaws.com/aaa-bbb/?list-type=2&max-keys=10&prefix=":
 		'<?xml version="1.0" encoding="UTF-8"?><Error><Code>NoSuchBucket</Code><Message>The specified bucket does not exist</Message><BucketName>aaa-bbb</BucketName><RequestId>YNKQQ5CHEY8T1NJW</RequestId><HostId>amI3UsqQ6kbks0QA799a0mtfeMxBAL2eyJ73zf73A+tyohffySVep8pjfe0uxaNzIcxhRuZmLOA=</HostId></Error>',
 		"https://s3-eu-central-1.amazonaws.com/buck-list/?list-type=2&max-keys=10&prefix=":
-		'<?xml version="1.0" encoding="UTF-8"?><ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>buck-list</Name><Prefix></Prefix><NextContinuationToken>18AYKGrNU+eEyBpQpLqmP7sa97tujeSo6WioT9GWV9zwYJpFFPgWpWURUW/dtYLR3eU5JD6IGyi+yR8gW5AobRQ==</NextContinuationToken><KeyCount>2</KeyCount><MaxKeys>2</MaxKeys><IsTruncated>true</IsTruncated><Contents><Key>.env</Key><LastModified>2022-04-19T11:43:10.000Z</LastModified><ETag>&quot;f030741faa47308e37d5e0671c5a4228&quot;</ETag><Size>6717</Size><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>hello.txt</Key><LastModified>2022-03-14T13:15:29.000Z</LastModified><ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag><Boo/><Arr>0</Arr><Arr>1</Arr><Size>0</Size><StorageClass>STANDARD</StorageClass></Contents></ListBucketResult>'
+		'<?xml version="1.0" encoding="UTF-8"?>\n<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>buck-list</Name><Prefix></Prefix><NextContinuationToken>18AYKGrNU+eEyBpQpLqmP7sa97tujeSo6WioT9GWV9zwYJpFFPgWpWURUW/dtYLR3eU5JD6IGyi+yR8gW5AobRQ==</NextContinuationToken><KeyCount>2</KeyCount><MaxKeys>2</MaxKeys><IsTruncated>true</IsTruncated><Contents><Key>.env</Key><LastModified>2022-04-19T11:43:10.000Z</LastModified><ETag>&quot;f030741faa47308e37d5e0671c5a4228&quot;</ETag><Size>6717</Size><StorageClass>STANDARD</StorageClass></Contents><Contents><Key>hello.txt</Key><LastModified>2022-03-14T13:15:29.000Z</LastModified><ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag><Boo/><Arr>0</Arr><Arr>1</Arr><Size>0</Size><StorageClass>STANDARD</StorageClass></Contents></ListBucketResult>',
+		"https://s3-eu-central-1.amazonaws.com/buck-list2/?list-type=2&max-keys=11&prefix=":
+		'<?xml version="1.0" encoding="UTF-8"?>\n<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>buck-list2</Name><Prefix></Prefix><KeyCount>1</KeyCount><MaxKeys>11</MaxKeys><IsTruncated>false</IsTruncated><Contents><Key>streamed-gh-action-test1.txt</Key><LastModified>2025-04-02T15:31:58.000Z</LastModified><ETag>&quot;f149fa32b1643ea05b6d1c91a5851a23&quot;</ETag>\n<ChecksumAlgorithm>CRC64NVME</ChecksumAlgorithm><ChecksumType>FULL_OBJECT</ChecksumType><Size>24</Size><StorageClass>STANDARD</StorageClass></Contents></ListBucketResult>'
 	}
 
 	function fakeRequest(url, opts, next) {
@@ -274,7 +276,7 @@ describe("S3 Mock", function() {
 
 		s3client.list("", null, function(err, data) {
 			assert.notOk(err)
-			assert.own({
+			assert.own(data, {
 				name: "buck-list",
 				prefix: "",
 				nextContinuationToken: "18AYKGrNU+eEyBpQpLqmP7sa97tujeSo6WioT9GWV9zwYJpFFPgWpWURUW/dtYLR3eU5JD6IGyi+yR8gW5AobRQ==",
@@ -283,18 +285,20 @@ describe("S3 Mock", function() {
 				isTruncated: "true",
 				contents: [
 					{
-						"Key": ".env",
-						"LastModified": "2022-04-19T11:43:10.000Z",
-						"ETag": "&quot;f030741faa47308e37d5e0671c5a4228&quot;",
-						"Size": "6717",
-						"StorageClass": "STANDARD"
+						"key": ".env",
+						"lastModified": "2022-04-19T11:43:10.000Z",
+						"eTag": "&quot;f030741faa47308e37d5e0671c5a4228&quot;",
+						"size": "6717",
+						"storageClass": "STANDARD"
 					},
 					{
-						"Key": "hello.txt",
-						"LastModified": "2022-03-14T13:15:29.000Z",
-						"ETag": "&quot;d41d8cd98f00b204e9800998ecf8427e&quot;",
-						"Size": "0",
-						"StorageClass": "STANDARD"
+						"key": "hello.txt",
+						"lastModified": "2022-03-14T13:15:29.000Z",
+						"eTag": "&quot;d41d8cd98f00b204e9800998ecf8427e&quot;",
+						"boo": true,
+						"arr": ["0", "1"],
+						"size": "0",
+						"storageClass": "STANDARD"
 					}
 				]
 			})
@@ -309,6 +313,47 @@ describe("S3 Mock", function() {
 					"x-amz-date": "20220423T130929Z",
 					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=94ff79fa807c4b865d476c359e54f58d279a6525fb1a0f1e0ecf0fd5f80bd61c"
+				}
+			})
+			assert.end()
+		})
+		mock.tick()
+	})
+
+	it("should list files 2", function(assert, mock) {
+		var s3client = mockedClient(mock, {bucket: "buck-list2"})
+
+		s3client.list("", {maxKeys: 11}, function(err, data) {
+			assert.notOk(err)
+			assert.own(data, {
+				name: "buck-list2",
+				prefix: "",
+				keyCount: 1,
+				maxKeys: 11,
+				isTruncated: "false",
+				contents: [
+					{
+						"key":"streamed-gh-action-test1.txt",
+						"lastModified":"2025-04-02T15:31:58.000Z",
+						"eTag":"&quot;f149fa32b1643ea05b6d1c91a5851a23&quot;",
+						"checksumAlgorithm":"CRC64NVME",
+						"checksumType":"FULL_OBJECT",
+						"size":"24",
+						"storageClass":"STANDARD"
+					}
+				]
+			})
+			assert.own(s3client.client.request, {
+				called: 1,
+				errors: 0
+			})
+			assert.fnCalled(s3client, 0, "https://s3-eu-central-1.amazonaws.com/buck-list2/?list-type=2&max-keys=11&prefix=", {
+				method: "GET",
+				headers: {
+					"host": "s3-eu-central-1.amazonaws.com",
+					"x-amz-date": "20220423T130929Z",
+					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=3419651356cb5dc53e4988437f3c6efd9afe6c9a6e912519da251ccc1a208be4"
 				}
 			})
 			assert.end()

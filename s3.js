@@ -139,7 +139,7 @@ module.exports = function S3(opts) {
 	function parseXml(str) {
 		var key, val
 		, json = {}
-		, re = /<(\w)([-\w]+)(?:\/|[^>]*>((?:(?!<\1)[\s\S])*)<\/\1\2)>/gm
+		, re = /<(\w)([-\w]*)(?:\/|[^>]*>((?:(?!<\1\2)[\s\S])*)<\/\1\2)>/gm
 		for (; (val = re.exec(str)); ) {
 			key = val[1].toLowerCase() + val[2]
 			val = val[3] != null ? parseXml(val[3]) : true
