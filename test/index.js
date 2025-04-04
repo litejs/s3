@@ -33,6 +33,7 @@ describe("S3 Mock", function() {
 			},
 			on: function(ev, fn) {
 				listeners[ev] = fn
+				return response
 			}
 		}
 		return {
@@ -95,7 +96,8 @@ describe("S3 Mock", function() {
 					"x-amz-date": "20220423T130929Z",
 					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=c0fc0f277bb492d0c91af0e9d27092591f1b13c8f20b058226fc91d7c013d1a5"
-				}
+				},
+				body: null
 			})
 			assert.end()
 		})
@@ -120,7 +122,8 @@ describe("S3 Mock", function() {
 					"x-amz-date": "20220423T130929Z",
 					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=c0fc0f277bb492d0c91af0e9d27092591f1b13c8f20b058226fc91d7c013d1a5"
-				}
+				},
+				body: null
 			})
 			assert.end()
 		})
@@ -131,6 +134,7 @@ describe("S3 Mock", function() {
 		var s3client = mockedClient(mock, { bucket: "buck-1", userAgent: "Dummy/1.0" })
 		, streamReadable = { pipe: mock.fn(), read: mock.fn("Hello") }
 		, stream = { pipe: mock.fn(), write: mock.fn() }
+		stream.end = stream.write
 
 		s3client.put("file1.txt", streamReadable)
 		s3client.get("file1.txt", stream)
@@ -167,7 +171,8 @@ describe("S3 Mock", function() {
 					"x-amz-date": "20220423T130929Z",
 					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=0beac7539f091f6639599716f45739c55abf9544f39780bfae2bf92da2c35847"
-				}
+				},
+				body: null
 			})
 			assert.end()
 		})
@@ -191,7 +196,8 @@ describe("S3 Mock", function() {
 					"x-amz-date": "20220423T130929Z",
 					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=f77ab4962fa59ed8823503a65a552cb51a5be67589504e314fdb21340a0d71a1"
-				}
+				},
+				body: null
 			})
 			assert.end()
 		})
@@ -215,7 +221,8 @@ describe("S3 Mock", function() {
 					"x-amz-date": "20220423T130929Z",
 					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=a267714c9315bbd470114c8ffa9b378d15ef40d83af2e5ff8c294ff837044606"
-				}
+				},
+				body: null
 			})
 			assert.end()
 		})
@@ -239,7 +246,8 @@ describe("S3 Mock", function() {
 					"x-amz-date": "20220423T130929Z",
 					"x-amz-content-sha256": "64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date, Signature=7c3d078bb4da25b219264e060bea329836f27487477060d289daeca60435f9bc"
-				}
+				},
+				body: data
 			})
 			assert.end()
 		})
@@ -264,7 +272,8 @@ describe("S3 Mock", function() {
 					"x-amz-content-sha256": "64ec88ca00b268e5ba1a35678a1b5316d212f4f366b2477232534a8aeca37f3c",
 					"x-amz-meta-hello": "world",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=content-length;host;x-amz-content-sha256;x-amz-date;x-amz-meta-hello, Signature=165648bd217c0e8a131fc06a65f95b85936fa15918ad7ee8e865848438e2c865"
-				}
+				},
+				body: data
 			})
 			assert.end()
 		})
@@ -313,7 +322,8 @@ describe("S3 Mock", function() {
 					"x-amz-date": "20220423T130929Z",
 					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=94ff79fa807c4b865d476c359e54f58d279a6525fb1a0f1e0ecf0fd5f80bd61c"
-				}
+				},
+				body: null
 			})
 			assert.end()
 		})
@@ -388,7 +398,8 @@ describe("S3 Mock", function() {
 					"x-amz-date": "20220423T130929Z",
 					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=e5c62c6e40d8ef5bfa00b425754f4f81e5399a28a0a69924507e55ac74bb87ba"
-				}
+				},
+				body: null
 			})
 			assert.end()
 		})
@@ -412,7 +423,8 @@ describe("S3 Mock", function() {
 					"x-amz-date": "20220423T130929Z",
 					"x-amz-content-sha256": "UNSIGNED-PAYLOAD",
 					"Authorization": "AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20220423/eu-central-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=910e361836dd01e54e022fca928db767b4108554f7ed22bfaf901db40233bd25"
-				}
+				},
+				body: null
 			})
 			assert.end()
 		})

@@ -13,7 +13,7 @@ module.exports = function S3(opts) {
 	, hmac = (key, data) => crypto.createHmac("sha256", key).update(data).digest()
 	, isFn = fn => typeof fn === "function"
 	, isObj = obj => !!obj && obj.constructor === Object
-	, isStream = stream => stream && isFn(stream.pipe)
+	, isStream = stream => stream && isFn(stream.getReader || stream.getWriter || stream.pipe)
 
 	Object.assign(s3, {
 		protocol: "https",
@@ -21,6 +21,7 @@ module.exports = function S3(opts) {
 		endpoint: "s3." + opts.region + ".amazonaws.com",
 		del: req.bind(s3, "DELETE", null),
 		get: req.bind(s3, "GET", null),
+		fetch: fakeFetch,
 		list: function(path, opts, next) {
 			if (isFn(opts)) {
 				next = opts
@@ -109,32 +110,61 @@ module.exports = function S3(opts) {
 		if (!isFn(next)) return new Promise(makeReq)
 		makeReq(next.bind(null, null), next)
 		function makeReq(resolve, reject) {
-			var req = client.request(signed.url, { method: method, headers: headers }, handle)
-			if (isStream(data)) data.pipe(req)
-			else req.end(data)
-			function handle(res) {
-				res.on("error", reject)
-				if (res.statusCode === 200 && isStream(next)) {
-					res.pipe(next)
-					return res.on("end", resolve)
+			s3.fetch(signed.url, { method: method, headers: headers, body: data, duplex: "half" })
+			.then(res => {
+				if (res.ok && isStream(next)) {
+					return res.body.pipeTo(next.pipe ? require("stream").Writable.toWeb(next) : next).then(resolve)
 				}
-				var data = ""
-				res.on("data", chunk => data += chunk)
-				res.on("end", () => {
-					if (res.statusCode > 299) {
+				res.text().then(data => {
+					if (!res.ok) {
 						data = method !== "HEAD" && parseXml(data).error || (
 							path ? "The specified key does not exist." : "The specified bucket is not valid."
 						)
 						return reject(Error(data.message || data))
 					}
 					data = method === "HEAD" ? Object.assign({
-						size: +res.headers["content-length"],
-						mtime: new Date(res.headers["last-modified"]),
-					}, res.headers) : parseXml(data)
+						size: +res.headers.get("content-length"),
+						mtime: new Date(res.headers.get("last-modified")),
+					}, Object.fromEntries(res.headers.entries())) : parseXml(data)
+					if (isStream(next)) next.end(data)
 					resolve(data.listBucketResult || data.error || data)
 				})
-			}
+			})
 		}
+	}
+	function fakeFetch(url, opts) {
+		return new Promise(function(resolve, reject) {
+			var data = ""
+			, addData = chunk => data += chunk
+			, client = s3.client || require(url[4] === "s" ? "https" : "http")
+			, req = client.request(url, opts, res => {
+				res.on("error", reject).on("data", addData)
+				resolve({
+					ok: res.statusCode >= 200 && res.statusCode < 300,
+					status: res.statusCode,
+					text: () => new Promise(reso => {
+						if (res.complete) reso(data)
+						else res.on("end", () => reso(data))
+					}),
+					body: {
+						pipeTo: stream => new Promise(reso => {
+							if (!stream.pipe) stream = require("stream").Writable.fromWeb(stream)
+							if (data) stream.write(data)
+							res.off("data", addData).pipe(stream.on("close", reso))
+						}),
+					},
+					headers: {
+						entries: () => Object.entries(res.headers),
+						get: name => res.headers[name]
+					}
+				})
+			})
+			if (isStream(opts.body)) {
+				if (opts.body.pipe) opts.body.pipe(req)
+				else require("stream").Readable.fromWeb(opts.body).pipe(req)
+			}
+			else req.end(opts.body)
+		})
 	}
 	function parseXml(str) {
 		var key, val

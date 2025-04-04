@@ -1,4 +1,5 @@
 
+describe("Native fetch: {0}", typeof fetch === "function" ? [true, false] : [false], nativeFetch=>{
 
 describe("S3 live on {0} {1}", [
 	[ "AWS", "eu-north-1", true ],
@@ -36,6 +37,8 @@ describe("S3 live on {0} {1}", [
 	})
 	, fileName = "gh-action-test1.txt"
 	, content = "Hello " + Math.random()
+
+	if (nativeFetch) s3client.fetch = fetch
 
 	it("should upload a file", function(assert) {
 		assert.setTimeout(5000)
@@ -107,7 +110,7 @@ describe("S3 live on {0} {1}", [
 		})
 	})
 
-	it("should stream a file", async function(assert) {
+	it("should stream a file to node stream", async function(assert) {
 		assert.setTimeout(5000)
 		var name = "./stream-" + fileName
 		, writeTo = fs.createWriteStream(name)
@@ -115,6 +118,24 @@ describe("S3 live on {0} {1}", [
 		assert.equal(fs.readFileSync(name, "utf8"), content)
 
 		var readFrom = fs.createReadStream(name)
+		, stat = fs.statSync(name)
+		readFrom.length = stat.size
+
+		await s3client.put("streamed-" + fileName, readFrom)
+
+		assert.equal(await s3client.get("streamed-" + fileName), content)
+
+		fs.unlinkSync(name)
+	})
+
+	it("should stream a file to web stream", async function(assert) {
+		assert.setTimeout(5000)
+		var name = "./stream2-" + fileName
+		, writeTo = require("stream").Writable.toWeb(fs.createWriteStream(name))
+		await s3client.get(fileName, writeTo)
+		assert.equal(fs.readFileSync(name, "utf8"), content)
+
+		var readFrom = require("stream").Readable.toWeb(fs.createReadStream(name))
 		, stat = fs.statSync(name)
 		readFrom.length = stat.size
 
@@ -197,5 +218,8 @@ describe("S3 live on {0} {1}", [
 			assert.notOk(err)
 		})
 	})
+})
+
+
 })
 
