@@ -152,6 +152,12 @@ describe("S3 live on {0} {1}", [
 		})
 	})
 
+	var keyNotFound = [
+		"The specified key does not exist.",
+		"Key not found",
+		"Shadow bucket: The specified key does not exist.",
+	]
+
 	it("should get error on streaming non-existing file", async function(assert, mock) {
 		assert.setTimeout(5000)
 
@@ -161,7 +167,7 @@ describe("S3 live on {0} {1}", [
 			await s3client.get("non-existing-" + fileName, writeTo)
 		} catch(err) {
 			assert.ok(err)
-			assert.anyOf(err.message, [ "The specified key does not exist.", "Key not found" ])
+			assert.anyOf(err.message, keyNotFound)
 		}
 	})
 
@@ -172,7 +178,7 @@ describe("S3 live on {0} {1}", [
 		, writeTo = fs.createWriteStream(name)
 		return s3client.get("non-existing-" + fileName, writeTo).catch(function(err) {
 			assert.ok(err)
-			assert.anyOf(err.message, [ "The specified key does not exist.", "Key not found" ])
+			assert.anyOf(err.message, keyNotFound)
 		})
 	})
 
@@ -181,7 +187,7 @@ describe("S3 live on {0} {1}", [
 		s3client.get("non-existing-" + fileName, function(err, data) {
 			// Blackblaze returns "Key not found"
 			assert.ok(err)
-			assert.anyOf(err.message, [ "The specified key does not exist.", "Key not found" ])
+			assert.anyOf(err.message, keyNotFound)
 			assert.notOk(data)
 			assert.end()
 		})
