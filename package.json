@@ -16,6 +16,6 @@
     "test": "lj t test/index.js"
   },
   "devDependencies": {
-    "@litejs/cli": "25.1.1"
+    "@litejs/cli": "26.6.0"
   }
 }

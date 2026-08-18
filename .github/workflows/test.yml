@@ -4,8 +4,8 @@ jobs:
   Coverage:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
-    - uses: actions/setup-node@v5
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
     - run: npm install --no-audit
     - run: npm audit --audit-level=low
     - run: npx c8 -r lcovonly -r text --check-coverage --100 npm test
@@ -18,7 +18,7 @@ jobs:
   Bun:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v7
     - uses: oven-sh/setup-bun@v2
     - run: bun i
     - run: bun x npm t
@@ -37,8 +37,8 @@ jobs:
       run: |
         git config --global core.autocrlf false
         tzutil /s "FLE Standard Time"
-    - uses: actions/checkout@v5
-    - uses: actions/setup-node@v5
+    - uses: actions/checkout@v7
+    - uses: actions/setup-node@v7
       with:
         node-version: ${{ matrix.node }}
         architecture: ${{ matrix.arch }}
